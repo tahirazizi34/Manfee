@@ -15,6 +15,25 @@ const RV = {2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
 
 app.get('/', (req,res) => res.send('Manfee server is running'));
 
+// Serve socket.io client with no-cache headers to prevent 304 issues
+app.get('/sio.js', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  // socket.io client is in node_modules
+  const sioPath = path.join(__dirname, 'node_modules', 'socket.io', 'client-dist', 'socket.io.min.js');
+  try {
+    const data = fs.readFileSync(sioPath);
+    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.send(data);
+  } catch(e) {
+    // fallback: redirect to socket.io built-in endpoint with cache busting
+    res.redirect('/socket.io/socket.io.js');
+  }
+});
+
 function uid(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
 
 function broadcast(code){ if(rooms[code]) io.to(code).emit('room_update', rooms[code]); }
