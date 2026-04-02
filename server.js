@@ -18,6 +18,7 @@ app.get('/', (req,res) => res.send('Manfee server is running'));
 function uid(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
 
 function broadcast(code){ if(rooms[code]) io.to(code).emit('room_update', rooms[code]); }
+function broadcastLobby(){ io.emit('rooms_list', publicRooms()); }
 
 function shuffle(a){ for(let i=a.length-1;i>0;i--){let j=~~(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
@@ -288,6 +289,7 @@ io.on('connection', socket => {
     socket.emit('room_created', { code });
     socket.emit('joined_room', { room:rooms[code] });
     broadcast(code);
+    broadcastLobby();
   });
 
   socket.on('join_room', ({ code, playerName }) => {
@@ -302,6 +304,7 @@ io.on('connection', socket => {
     if(!alreadySeated&&!alreadySpec) room.spectators.push({ id:socket.id, name:playerName });
     socket.emit('joined_room', { room });
     broadcast(code);
+    broadcastLobby();
   });
 
   socket.on('take_seat', ({ code, seat }) => {
@@ -311,6 +314,7 @@ io.on('connection', socket => {
     room.spectators = room.spectators.filter(s=>s.id!==socket.id);
     room.seats[seat] = { id:socket.id, name:socket.data.name };
     broadcast(code);
+    broadcastLobby();
   });
 
   socket.on('leave_seat', ({ code }) => {
@@ -332,6 +336,7 @@ io.on('connection', socket => {
     if(room.seats.filter(Boolean).length<4){ socket.emit('error_msg','Need 4 players seated'); return; }
     room.started = true;
     room.game.round = 0;
+    broadcastLobby();
     room.game.scores = [0,0];
     room.game.dealer = -1;
     io.to(code).emit('game_start',{
