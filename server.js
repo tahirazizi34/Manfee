@@ -2,490 +2,552 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
+
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*', methods: ['GET','POST'] } });
+const io = new Server(server, {
+  cors: { origin: '*', methods: ['GET', 'POST'] }
+});
 
 const rooms = {};
-const SYM = {S:'♠',H:'♥',D:'♦',C:'♣'};
-const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-const RV = {2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
 
-app.get('/', (req,res) => res.send('Manfee server is running'));
+// Health check
+app.get('/', (req, res) => {
+  res.send('Manfee server is running. Rooms: ' + Object.keys(rooms).length);
+});
 
-// Serve socket.io client with no-cache headers to prevent 304 issues
+// Serve socket.io client with no-cache headers
 app.get('/sio.js', (req, res) => {
-  const fs = require('fs');
-  const path = require('path');
-  // socket.io client is in node_modules
   const sioPath = path.join(__dirname, 'node_modules', 'socket.io', 'client-dist', 'socket.io.min.js');
-  try {
-    const data = fs.readFileSync(sioPath);
+  if (fs.existsSync(sioPath)) {
     res.setHeader('Content-Type', 'application/javascript');
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    res.send(data);
-  } catch(e) {
-    // fallback: redirect to socket.io built-in endpoint with cache busting
+    res.sendFile(sioPath);
+  } else {
     res.redirect('/socket.io/socket.io.js');
   }
 });
 
-function uid(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
-
-function broadcast(code){ if(rooms[code]) io.to(code).emit('room_update', rooms[code]); }
-function broadcastLobby(){ io.emit('rooms_list', publicRooms()); }
-
-function shuffle(a){ for(let i=a.length-1;i>0;i--){let j=~~(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-
-function newDeck(){
-  let d=[];
-  for(let s of['S','H','D','C']) for(let r of RANKS) d.push({r,s});
-  return shuffle(d);
+// ── HELPERS ─────────────────────────────────────────────────────────
+function uid() {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
-function teamOf(seat){ return (seat===0||seat===2)?0:1; }
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
-function publicRooms(){
-  return Object.values(rooms)
-    .filter(r=>r.visibility==='public'&&!r.started)
-    .map(r=>({
-      code:r.code, name:r.name, mode:r.mode,
-      visibility:r.visibility, hostName:r.hostName,
-      playerCount:r.seats.filter(Boolean).length
+function newDeck() {
+  const suits = ['S', 'H', 'D', 'C'];
+  const ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+  const deck = [];
+  for (const s of suits) for (const r of ranks) deck.push({ r, s });
+  return shuffle(deck);
+}
+
+const RV = { 2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14 };
+
+function teamOf(seat) {
+  return (seat === 0 || seat === 2) ? 0 : 1;
+}
+
+function broadcast(code) {
+  if (rooms[code]) io.to(code).emit('room_update', rooms[code]);
+}
+
+function broadcastLobby() {
+  const list = Object.values(rooms)
+    .filter(r => r.visibility === 'public' && !r.started)
+    .map(r => ({
+      code: r.code,
+      name: r.name,
+      mode: r.mode,
+      visibility: r.visibility,
+      hostName: r.hostName,
+      playerCount: r.seats.filter(Boolean).length
     }));
+  io.emit('rooms_list', list);
 }
 
-// ── DEAL & GAME LOGIC ────────────────────────────────────────────
-function dealRound(code){
+// ── GAME LOGIC ───────────────────────────────────────────────────────
+function dealRound(code) {
   const room = rooms[code];
-  if(!room) return;
+  if (!room) return;
+  const g = room.game;
 
-  let g = room.game;
-  g.round = g.round||1;
-  g.scores = g.scores||[0,0];
-  g.dealer = g.dealer>=0 ? (g.dealer+1)%4 : ~~(Math.random()*4);
-  g.firstGame = g.firstGame!==false;
-  g.firstGame = false;
-  g.bids = [-1,-1,-1,-1];
-  g.teamTarget = [-1,-1];
+  // Advance dealer
+  if (g.dealer < 0) {
+    g.dealer = Math.floor(Math.random() * 4);
+  } else {
+    g.dealer = (g.dealer + 1) % 4;
+  }
+  g.round = (g.round || 0) + 1;
+  g.bids = [-1, -1, -1, -1];
+  g.teamTarget = [-1, -1];
   g.roundPts = 1;
   g.dealerDecision = 'accept';
-  g.tr = [0,0,0,0];
-  g.tk = [null,null,null,null];
+  g.tr = [0, 0, 0, 0];
+  g.tk = [null, null, null, null];
   g.led = null;
   g.tc = 0;
   g.switched = false;
-  g.trump = room.mode==='kash' ? null : 'S';
+  g.trump = room.mode === 'kash' ? null : 'S';
   g.phase = 'bid';
+  g.firstPlayer = (g.dealer + 1) % 4;
+  g.bidOrder = [1, 2, 3, 0].map(o => (g.dealer + o) % 4);
+  g.bidIdx = 0;
 
-  // Deal 13 cards each
-  let deck = newDeck();
-  g.hands = [[],[],[],[]];
-  for(let i=0;i<deck.length;i++) g.hands[i%4].push(deck[i]);
+  // Deal hands
+  const deck = newDeck();
+  g.hands = [[], [], [], []];
+  for (let i = 0; i < deck.length; i++) g.hands[i % 4].push(deck[i]);
 
-  // First player = seat to right of dealer (clockwise = dealer+1 mod 4)
-  g.firstPlayer = (g.dealer+1)%4;
-
-  // Tell everyone new round
-  io.to(code).emit('new_round',{
-    dealer: g.dealer, round: g.round,
-    scores: g.scores, firstGame: g.firstGame,
-    seatOrder: room.seats.map(s=>({id:s.id,name:s.name}))
+  // Notify everyone
+  io.to(code).emit('new_round', {
+    dealer: g.dealer,
+    round: g.round,
+    scores: g.scores,
+    seatOrder: room.seats.map(s => ({ id: s.id, name: s.name }))
   });
 
-  // Send each player their hand + other players' card counts
+  // Send each player their hand
   room.seats.forEach((seat, seatIdx) => {
-    let counts = g.hands.map((h,i)=>i===seatIdx?0:h.length);
-    io.to(seat.id).emit('deal_hand',{
+    const counts = g.hands.map((h, i) => i === seatIdx ? 0 : h.length);
+    io.to(seat.id).emit('deal_hand', {
       hand: g.hands[seatIdx],
       cardCounts: counts
     });
   });
+
+  // Start bidding after short delay
+  setTimeout(() => askNextBid(code), 1000);
 }
 
-function startBidding(code){
+function askNextBid(code) {
   const room = rooms[code];
+  if (!room) return;
   const g = room.game;
-  g.bidIdx = 0;
-  // Bidding order: clockwise from right of dealer, dealer bids last
-  g.bidOrder = [1,2,3,0].map(o=>(g.dealer+o)%4);
-  askNextBid(code);
-}
 
-function askNextBid(code){
-  const room = rooms[code];
-  const g = room.game;
-  if(g.bidIdx >= 3){ // all non-dealers done → dealer's turn
+  if (g.bidIdx >= 3) {
     askDealerDecision(code);
     return;
   }
-  let seat = g.bidOrder[g.bidIdx];
-  let bidsPlaced = [...g.bids];
-  io.to(room.seats[seat].id).emit('bid_request',{
-    seat, bidsPlaced, bidOrder: g.bidOrder
-  });
-  // Also tell others who is bidding
-  room.seats.forEach((s,i)=>{
-    if(i!==seat) io.to(s.id).emit('bid_request',{ seat, bidsPlaced, bidOrder:g.bidOrder });
-  });
+
+  const seat = g.bidOrder[g.bidIdx];
+  const bidsPlaced = [...g.bids];
+
+  // Tell everyone who is bidding
+  io.to(code).emit('bid_request', { seat, bidsPlaced, bidOrder: g.bidOrder });
 }
 
-function askDealerDecision(code){
+function askDealerDecision(code) {
   const room = rooms[code];
-  const g = room.game;
-  let ds = g.dealer;
-  let bidsTotal = g.bids.reduce((a,b)=>a+(b>=0?b:0),0);
-  let dealerTeam = teamOf(ds);
-  let oppBid = 0;
-  [0,1,2,3].forEach(s=>{if(s!==ds&&teamOf(s)!==dealerTeam&&g.bids[s]>=0) oppBid+=g.bids[s];});
-  g._oppBid = oppBid;
-  g._bidsTotal = bidsTotal;
-  io.to(room.seats[ds].id).emit('dealer_request',{ seat:ds, bidsTotal, oppBid });
-  room.seats.forEach((s,i)=>{
-    if(i!==ds) io.to(s.id).emit('dealer_request',{ seat:ds, bidsTotal, oppBid });
-  });
-}
-
-function applyDealerDecision(code, decision){
-  const room = rooms[code];
+  if (!room) return;
   const g = room.game;
   const ds = g.dealer;
+  const bidsTotal = g.bids.reduce((a, b) => a + (b >= 0 ? b : 0), 0);
+  const dealerTeam = teamOf(ds);
+  let oppBid = 0;
+  [0, 1, 2, 3].forEach(s => {
+    if (s !== ds && teamOf(s) !== dealerTeam && g.bids[s] >= 0) oppBid += g.bids[s];
+  });
+  g._oppBid = oppBid;
+  g._bidsTotal = bidsTotal;
+  io.to(code).emit('dealer_request', { seat: ds, bidsTotal, oppBid });
+}
+
+function applyDealerDecision(code, decision, socketId) {
+  const room = rooms[code];
+  if (!room) return;
+  const g = room.game;
+  const ds = g.dealer;
+
+  if (room.seats[ds].id !== socketId) return;
+
   const dealerTeam = teamOf(ds);
   const oppBid = g._oppBid;
   const bidsTotal = g._bidsTotal;
-
   let dealerNeed, oppNeed, pts;
-  if(decision==='accept'){
-    dealerNeed = 13-bidsTotal+1; oppNeed = bidsTotal; pts=1;
-  } else if(decision==='sw1'){
-    dealerNeed = oppBid+1; oppNeed = 13-(oppBid+1); pts=1;
+
+  if (decision === 'accept') {
+    dealerNeed = (13 - bidsTotal) + 1;
+    oppNeed = bidsTotal;
+    pts = 1;
+  } else if (decision === 'sw1') {
+    dealerNeed = oppBid + 1;
+    oppNeed = 13 - (oppBid + 1);
+    pts = 1;
     rotateHands(room, g);
-    g.switched=true;
+    g.switched = true;
   } else {
-    dealerNeed = oppBid+2; oppNeed = 13-(oppBid+2); pts=2;
+    dealerNeed = oppBid + 2;
+    oppNeed = 13 - (oppBid + 2);
+    pts = 2;
     rotateHands(room, g);
-    g.switched=true;
+    g.switched = true;
   }
 
-  g.teamTarget = dealerTeam===0 ? [dealerNeed,oppNeed] : [oppNeed,dealerNeed];
+  g.teamTarget = dealerTeam === 0 ? [dealerNeed, oppNeed] : [oppNeed, dealerNeed];
   g.roundPts = pts;
   g.dealerDecision = decision;
 
-  io.to(code).emit('dealer_decided',{
-    seat:ds, decision, teamTargets:g.teamTarget, roundPts:pts
+  io.to(code).emit('dealer_decided', {
+    seat: ds, decision, teamTargets: g.teamTarget, roundPts: pts
   });
 
-  if(g.switched){
-    // Send each player their new hand
-    room.seats.forEach((seat,seatIdx)=>{
-      io.to(seat.id).emit('switch_hands',{ newHand: g.hands[seatIdx] });
-    });
-    // Wait for all players to confirm ready
+  if (g.switched) {
     g.switchReady = new Set();
+    room.seats.forEach((seat, idx) => {
+      io.to(seat.id).emit('switch_hands', { newHand: g.hands[idx] });
+    });
   } else {
     startPlay(code);
   }
 }
 
-function rotateHands(room, g){
-  // Clockwise: seat 0→seat 1→seat 2→seat 3→seat 0
-  let old = g.hands.map(h=>[...h]);
-  g.hands[1]=old[0]; g.hands[2]=old[1]; g.hands[3]=old[2]; g.hands[0]=old[3];
+function rotateHands(room, g) {
+  const old = g.hands.map(h => [...h]);
+  g.hands[1] = old[0];
+  g.hands[2] = old[1];
+  g.hands[3] = old[2];
+  g.hands[0] = old[3];
 }
 
-function startPlay(code){
+function startPlay(code) {
   const room = rooms[code];
+  if (!room) return;
   const g = room.game;
   g.phase = 'play';
   g.turn = g.firstPlayer;
+  g.tk = [null, null, null, null];
+  g.led = null;
 
-  io.to(code).emit('play_start',{
+  io.to(code).emit('play_start', {
     firstPlayer: g.firstPlayer,
     teamTargets: g.teamTarget,
     roundPts: g.roundPts
   });
 
-  // Tell first player it's their turn
-  askPlay(code);
+  setTimeout(() => askPlay(code), 500);
 }
 
-function askPlay(code){
+function askPlay(code) {
   const room = rooms[code];
+  if (!room) return;
   const g = room.game;
-  let seat = g.turn;
-  io.to(room.seats[seat].id).emit('your_turn',{ seat, led:g.led });
+  const seat = g.turn;
+  io.to(room.seats[seat].id).emit('your_turn', { seat, led: g.led });
 }
 
-function resolvePlay(code){
+function resolvePlay(code) {
   const room = rooms[code];
+  if (!room) return;
   const g = room.game;
 
-  // Find winner
-  let led=g.led, best=null, bs=-1;
-  for(let i=0;i<4;i++){
-    let c=g.tk[i]; if(!c) continue;
-    if(!best){best=c;bs=i;continue;}
-    if(g.trump&&c.s===g.trump&&best.s!==g.trump){best=c;bs=i;continue;}
-    if(g.trump&&best.s===g.trump&&c.s!==g.trump) continue;
-    if(c.s===led&&(best.s!==led||RV[c.r]>RV[best.r])){best=c;bs=i;}
+  const led = g.led;
+  let best = null, bs = -1;
+  for (let i = 0; i < 4; i++) {
+    const c = g.tk[i];
+    if (!c) continue;
+    if (!best) { best = c; bs = i; continue; }
+    if (g.trump && c.s === g.trump && best.s !== g.trump) { best = c; bs = i; continue; }
+    if (g.trump && best.s === g.trump && c.s !== g.trump) continue;
+    if (c.s === led && (best.s !== led || RV[c.r] > RV[best.r])) { best = c; bs = i; }
   }
-  let winner=bs;
-  let team=teamOf(winner);
+
+  const winner = bs;
   g.tr[winner]++;
   g.tc++;
-  g.tk=[null,null,null,null];
-  g.led=null;
+  g.tk = [null, null, null, null];
+  g.led = null;
 
-  io.to(code).emit('trick_result',{
-    winner, trickCounts:[...g.tr], nextTurn:winner
+  io.to(code).emit('trick_result', {
+    winner, trickCounts: [...g.tr], nextTurn: winner
   });
 
-  if(g.tc>=13){
-    setTimeout(()=>endRound(code), 900);
-    return;
+  if (g.tc >= 13) {
+    setTimeout(() => endRound(code), 1000);
+  } else {
+    g.turn = winner;
+    setTimeout(() => askPlay(code), 1200);
   }
-  g.turn=winner;
-  setTimeout(()=>askPlay(code), 1000);
 }
 
-function endRound(code){
+function endRound(code) {
   const room = rooms[code];
+  if (!room) return;
   const g = room.game;
 
-  let us=g.tr.filter((_,i)=>teamOf(i)===0).reduce((a,b)=>a+b,0);
-  let them=g.tr.filter((_,i)=>teamOf(i)===1).reduce((a,b)=>a+b,0);
-  let ut=g.teamTarget[0], tt=g.teamTarget[1];
-  let p0=0,p1=0,det='';
-  let pts=g.roundPts;
+  const us = g.tr.filter((_, i) => teamOf(i) === 0).reduce((a, b) => a + b, 0);
+  const them = g.tr.filter((_, i) => teamOf(i) === 1).reduce((a, b) => a + b, 0);
+  const ut = g.teamTarget[0], tt = g.teamTarget[1];
+  let p0 = 0, p1 = 0, det = '';
+  const pts = g.roundPts;
 
-  if(room.mode==='manfee'){
-    let usHit=us>=ut, themHit=them>=tt;
-    if(usHit&&themHit){p0=0;p1=0;det=`Both hit target → Tie 0-0\nUs:${us}/${ut} · Them:${them}/${tt}`;}
-    else if(usHit&&!themHit){p0=pts;p1=0;det=`Team A hit ${ut}+ → +${pts} pt${pts>1?'s':''}\nTeam B missed (${them}/${tt})`;}
-    else if(!usHit&&themHit){p0=0;p1=pts;det=`Team B hit ${tt}+ → +${pts} pt${pts>1?'s':''}\nTeam A missed (${us}/${ut})`;}
-    else{p0=0;p1=0;det=`Both missed → 0-0\nUs:${us}/${ut} · Them:${them}/${tt}`;}
+  if (room.mode === 'manfee') {
+    const usHit = us >= ut, themHit = them >= tt;
+    if (usHit && themHit)     { p0=0; p1=0; det=`Tie 0-0\nUs:${us}/${ut} · Them:${them}/${tt}`; }
+    else if (usHit && !themHit) { p0=pts; p1=0; det=`Team A +${pts} pt${pts>1?'s':''} (${us}/${ut})\nTeam B missed (${them}/${tt})`; }
+    else if (!usHit && themHit) { p0=0; p1=pts; det=`Team B +${pts} pt${pts>1?'s':''} (${them}/${tt})\nTeam A missed (${us}/${ut})`; }
+    else                       { p0=0; p1=0; det=`Both missed 0-0\nUs:${us}/${ut} · Them:${them}/${tt}`; }
   } else {
-    p0=us; p1=them; det=`Team A: ${us} tricks · Team B: ${them} tricks`;
+    p0 = us; p1 = them;
+    det = `Team A: ${us} tricks · Team B: ${them} tricks`;
   }
 
-  let mode=g.switched?`[Switch ${pts===2?'+2':'+1'}]\n`:'[Accept]\n';
-  det=mode+det;
-  g.scores[0]+=p0; g.scores[1]+=p1;
+  const mode = g.switched ? `[Switch ${pts===2?'+2':'+1'}]\n` : '[Accept]\n';
+  det = mode + det;
+  g.scores[0] += p0;
+  g.scores[1] += p1;
 
-  let win=52;
-  let gameOver=g.scores[0]>=win||g.scores[1]>=win;
-  let winner=g.scores[0]>=g.scores[1]?'Team A':'Team B';
+  const WIN = 52;
+  const gameOver = g.scores[0] >= WIN || g.scores[1] >= WIN;
+  const winner = g.scores[0] >= g.scores[1] ? 'Team A' : 'Team B';
 
-  io.to(code).emit('round_result',{
-    scores:[...g.scores], pts:[p0,p1], detail:det,
-    gameOver, winner: gameOver?winner:null
+  io.to(code).emit('round_result', {
+    scores: [...g.scores],
+    pts: [p0, p1],
+    detail: det,
+    gameOver,
+    winner: gameOver ? winner : null
   });
 }
 
-// ── SOCKET EVENTS ─────────────────────────────────────────────
+// ── SOCKET EVENTS ────────────────────────────────────────────────────
 io.on('connection', socket => {
   console.log('Connected:', socket.id);
 
   socket.on('list_rooms', () => {
-    socket.emit('rooms_list', publicRooms());
+    socket.emit('rooms_list', Object.values(rooms)
+      .filter(r => r.visibility === 'public' && !r.started)
+      .map(r => ({
+        code: r.code, name: r.name, mode: r.mode,
+        visibility: r.visibility, hostName: r.hostName,
+        playerCount: r.seats.filter(Boolean).length
+      }))
+    );
   });
 
   socket.on('create_room', ({ name, mode, visibility, hostName }) => {
     const code = uid();
     rooms[code] = {
-      code, name, mode, visibility, host:socket.id, hostName,
-      seats: [null,null,null,null], spectators: [], started:false,
-      game: { round:0, scores:[0,0], dealer:-1, firstGame:true }
+      code, name, mode, visibility,
+      host: socket.id, hostName,
+      seats: [null, null, null, null],
+      spectators: [],
+      started: false,
+      game: { round: 0, scores: [0, 0], dealer: -1 }
     };
     socket.join(code);
     socket.data.name = hostName;
     socket.data.room = code;
-    rooms[code].seats[0] = { id:socket.id, name:hostName };
+    rooms[code].seats[0] = { id: socket.id, name: hostName };
     socket.emit('room_created', { code });
-    socket.emit('joined_room', { room:rooms[code] });
+    socket.emit('joined_room', { room: rooms[code] });
     broadcast(code);
     broadcastLobby();
+    console.log('Room created:', code, 'by', hostName);
   });
 
   socket.on('join_room', ({ code, playerName }) => {
-    const room = rooms[code];
-    if(!room){ socket.emit('error_msg','Room not found'); return; }
-    if(room.started){ socket.emit('error_msg','Game already started'); return; }
-    socket.join(code);
+    const c = (code || '').toUpperCase().trim();
+    const room = rooms[c];
+    if (!room) { socket.emit('error_msg', 'Room "' + c + '" not found'); return; }
+    if (room.started) { socket.emit('error_msg', 'Game already started'); return; }
+    socket.join(c);
     socket.data.name = playerName;
-    socket.data.room = code;
-    const alreadySeated = room.seats.some(s=>s&&s.id===socket.id);
-    const alreadySpec = room.spectators.some(s=>s.id===socket.id);
-    if(!alreadySeated&&!alreadySpec) room.spectators.push({ id:socket.id, name:playerName });
+    socket.data.room = c;
+    const alreadyIn = room.seats.some(s => s && s.id === socket.id) ||
+                      room.spectators.some(s => s.id === socket.id);
+    if (!alreadyIn) room.spectators.push({ id: socket.id, name: playerName });
     socket.emit('joined_room', { room });
-    broadcast(code);
+    broadcast(c);
     broadcastLobby();
+    console.log(playerName, 'joined room', c);
   });
 
   socket.on('take_seat', ({ code, seat }) => {
-    console.log('take_seat:', socket.id, socket.data.name, 'code:', code, 'seat:', seat);
-    const room = rooms[code];
-    if(!room){ 
-      console.log('take_seat: room not found for code:', code, '| Available:', Object.keys(rooms));
-      socket.emit('error_msg', 'Room not found: ' + code); 
-      return; 
-    }
-    if(seat < 0 || seat > 3){
-      socket.emit('error_msg', 'Invalid seat: ' + seat);
+    const c = (code || '').toUpperCase().trim();
+    const room = rooms[c];
+    if (!room) { socket.emit('error_msg', 'Room not found'); return; }
+    const seatNum = parseInt(seat);
+    if (isNaN(seatNum) || seatNum < 0 || seatNum > 3) { socket.emit('error_msg', 'Bad seat'); return; }
+    if (room.seats[seatNum] && room.seats[seatNum].id !== socket.id) {
+      socket.emit('error_msg', 'Seat ' + (seatNum + 1) + ' is taken');
       return;
     }
-    if(room.seats[seat] && room.seats[seat].id !== socket.id){ 
-      socket.emit('error_msg','Seat ' + (seat+1) + ' is already taken');
-      return; 
-    }
-    // Remove player from any current seat or spectators
-    room.seats = room.seats.map(s=>(s&&s.id===socket.id)?null:s);
-    room.spectators = room.spectators.filter(s=>s.id!==socket.id);
-    // Place in new seat
-    const playerName = socket.data.name || 'Unknown';
-    room.seats[seat] = { id:socket.id, name:playerName };
-    console.log('take_seat: success -', playerName, 'in seat', seat);
-    broadcast(code);
+    // Remove from current position
+    room.seats = room.seats.map(s => (s && s.id === socket.id) ? null : s);
+    room.spectators = room.spectators.filter(s => s.id !== socket.id);
+    // Sit down
+    room.seats[seatNum] = { id: socket.id, name: socket.data.name || 'Player' };
+    console.log(socket.data.name, 'took seat', seatNum, 'in room', c);
+    broadcast(c);
     broadcastLobby();
   });
 
   socket.on('leave_seat', ({ code }) => {
-    const room = rooms[code]; if(!room) return;
-    room.seats = room.seats.map(s=>(s&&s.id===socket.id)?null:s);
-    if(!room.spectators.some(s=>s.id===socket.id))
-      room.spectators.push({ id:socket.id, name:socket.data.name });
+    const room = rooms[code];
+    if (!room) return;
+    room.seats = room.seats.map(s => (s && s.id === socket.id) ? null : s);
+    if (!room.spectators.some(s => s.id === socket.id)) {
+      room.spectators.push({ id: socket.id, name: socket.data.name || 'Player' });
+    }
     broadcast(code);
+    broadcastLobby();
   });
 
   socket.on('kick_seat', ({ code, seat }) => {
-    const room = rooms[code]; if(!room||room.host!==socket.id) return;
+    const room = rooms[code];
+    if (!room || room.host !== socket.id) return;
     const p = room.seats[seat];
-    if(p){ room.seats[seat]=null; room.spectators.push(p); io.to(p.id).emit('kicked_to_spectator'); broadcast(code); }
+    if (p) {
+      room.seats[seat] = null;
+      room.spectators.push(p);
+      io.to(p.id).emit('kicked_to_spectator');
+      broadcast(code);
+    }
   });
 
   socket.on('start_game', ({ code }) => {
-    const room = rooms[code]; if(!room||room.host!==socket.id) return;
-    if(room.seats.filter(Boolean).length<4){ socket.emit('error_msg','Need 4 players seated'); return; }
+    const room = rooms[code];
+    if (!room || room.host !== socket.id) return;
+    if (room.seats.filter(Boolean).length < 4) {
+      socket.emit('error_msg', 'Need 4 players seated to start');
+      return;
+    }
     room.started = true;
-    room.game.round = 0;
+    room.game = { round: 0, scores: [0, 0], dealer: -1 };
     broadcastLobby();
-    room.game.scores = [0,0];
-    room.game.dealer = -1;
-    io.to(code).emit('game_start',{
-      room, seatOrder: room.seats.map(s=>({id:s.id,name:s.name}))
+    io.to(code).emit('game_start', {
+      room,
+      seatOrder: room.seats.map(s => ({ id: s.id, name: s.name }))
     });
-    setTimeout(()=>dealRound(code), 500);
+    setTimeout(() => dealRound(code), 800);
   });
 
   socket.on('ready_to_bid', ({ code }) => {
-    // After dealer announce, host triggers bidding
-    const room = rooms[code]; if(!room) return;
-    if(socket.id===room.host||socket.id===room.seats[0]?.id){
-      startBidding(code);
+    // Any player confirming the dealer announce triggers bidding start
+    // Only process once (from first player who clicks OK)
+    const room = rooms[code];
+    if (!room || room.game.phase !== 'bid') return;
+    if (!room.game._bidStarted) {
+      room.game._bidStarted = true;
+      askNextBid(code);
     }
   });
 
   socket.on('place_bid', ({ code, bid }) => {
-    const room = rooms[code]; if(!room) return;
+    const room = rooms[code];
+    if (!room) return;
     const g = room.game;
-    const seat = room.seats.findIndex(s=>s&&s.id===socket.id);
-    if(seat<0) return;
-    g.bids[seat] = bid;
-    io.to(code).emit('bid_placed', { seat, bid });
+    const seat = room.seats.findIndex(s => s && s.id === socket.id);
+    if (seat < 0) return;
+    g.bids[seat] = parseInt(bid);
+    io.to(code).emit('bid_placed', { seat, bid: g.bids[seat] });
     g.bidIdx++;
-    if(g.bidIdx<3) askNextBid(code);
-    else askDealerDecision(code);
+    if (g.bidIdx < 3) {
+      askNextBid(code);
+    } else {
+      askDealerDecision(code);
+    }
   });
 
   socket.on('dealer_decision', ({ code, decision }) => {
-    const room = rooms[code]; if(!room) return;
-    const seat = room.seats.findIndex(s=>s&&s.id===socket.id);
-    if(seat!==room.game.dealer) return;
-    applyDealerDecision(code, decision);
+    applyDealerDecision(code, decision, socket.id);
   });
 
   socket.on('ready_to_play', ({ code }) => {
-    const room = rooms[code]; if(!room) return;
+    const room = rooms[code];
+    if (!room) return;
     const g = room.game;
-    if(!g.switchReady) return;
+    if (!g.switchReady) return;
     g.switchReady.add(socket.id);
-    if(g.switchReady.size>=4) startPlay(code);
+    if (g.switchReady.size >= 4) startPlay(code);
   });
 
   socket.on('play_card', ({ code, card }) => {
-    const room = rooms[code]; if(!room) return;
+    const room = rooms[code];
+    if (!room) return;
     const g = room.game;
-    const seat = room.seats.findIndex(s=>s&&s.id===socket.id);
-    if(seat!==g.turn) return;
-    // Remove from hand
-    g.hands[seat] = g.hands[seat].filter(c=>!(c.r===card.r&&c.s===card.s));
-    if(!g.led) g.led = card.s;
+    const seat = room.seats.findIndex(s => s && s.id === socket.id);
+    if (seat < 0 || seat !== g.turn) return;
+
+    // Remove card from hand
+    g.hands[seat] = g.hands[seat].filter(c => !(c.r === card.r && c.s === card.s));
+    if (!g.led) g.led = card.s;
     g.tk[seat] = card;
 
-    let counts = g.hands.map(h=>h.length);
-    let allPlayed = g.tk.every(c=>c!==null);
+    const counts = g.hands.map(h => h.length);
+    const allPlayed = g.tk.every(c => c !== null);
+    const nextTurn = allPlayed ? -1 : (g.turn + 1) % 4;
 
-    io.to(code).emit('card_played',{
-      seat, card, led:g.led,
-      nextTurn: allPlayed ? -1 : (g.turn+1)%4, // rough; server resolves
-      cardCounts: counts
-    });
+    io.to(code).emit('card_played', { seat, card, led: g.led, nextTurn, cardCounts: counts });
 
-    if(allPlayed){
-      setTimeout(()=>resolvePlay(code), 800);
+    if (allPlayed) {
+      setTimeout(() => resolvePlay(code), 900);
     } else {
-      g.turn = (g.turn+1)%4; // simplified CCW; adjust if needed
+      g.turn = nextTurn;
       askPlay(code);
     }
   });
 
   socket.on('next_round', ({ code }) => {
-    const room = rooms[code]; if(!room||room.host!==socket.id) return;
-    room.game.round++;
+    const room = rooms[code];
+    if (!room || room.host !== socket.id) return;
+    room.game._bidStarted = false;
     dealRound(code);
   });
 
   socket.on('restart_game', ({ code }) => {
-    const room = rooms[code]; if(!room||room.host!==socket.id) return;
-    room.game = { round:0, scores:[0,0], dealer:-1, firstGame:true };
+    const room = rooms[code];
+    if (!room || room.host !== socket.id) return;
+    room.game = { round: 0, scores: [0, 0], dealer: -1 };
     room.started = false;
-    setTimeout(()=>{ room.started=true; dealRound(code); }, 300);
+    setTimeout(() => {
+      room.started = true;
+      room.game._bidStarted = false;
+      dealRound(code);
+    }, 300);
   });
 
   socket.on('leave_room', ({ code }) => {
-    const room = rooms[code]; if(!room) return;
-    room.seats = room.seats.map(s=>(s&&s.id===socket.id)?null:s);
-    room.spectators = room.spectators.filter(s=>s.id!==socket.id);
-    socket.leave(code);
-    if(room.host===socket.id&&!room.started){
-      io.to(code).emit('room_closed','The host left.');
-      delete rooms[code];
-    } else {
-      io.to(code).emit('player_left',{ name:socket.data.name });
-      broadcast(code);
-    }
+    handleLeave(socket, code);
   });
 
   socket.on('disconnect', () => {
-    const code = socket.data.room;
-    if(!code||!rooms[code]) return;
-    const room = rooms[code];
-    room.seats = room.seats.map(s=>(s&&s.id===socket.id)?null:s);
-    room.spectators = room.spectators.filter(s=>s.id!==socket.id);
-    if(room.host===socket.id&&!room.started){
-      io.to(code).emit('room_closed','Host disconnected.');
-      delete rooms[code];
-    } else {
-      io.to(code).emit('player_left',{ name:socket.data.name });
-      broadcast(code);
-    }
-    console.log(`${socket.data.name||socket.id} disconnected`);
+    handleLeave(socket, socket.data.room);
+    console.log('Disconnected:', socket.data.name || socket.id);
   });
 });
 
+function handleLeave(socket, code) {
+  if (!code || !rooms[code]) return;
+  const room = rooms[code];
+  room.seats = room.seats.map(s => (s && s.id === socket.id) ? null : s);
+  room.spectators = room.spectators.filter(s => s.id !== socket.id);
+  socket.leave(code);
+  if (room.host === socket.id && !room.started) {
+    io.to(code).emit('room_closed', 'Host left the room');
+    delete rooms[code];
+  } else {
+    io.to(code).emit('player_left', { name: socket.data.name || 'A player' });
+    broadcast(code);
+  }
+  broadcastLobby();
+}
+
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Manfee server on port ${PORT}`));
+server.listen(PORT, () => {
+  console.log('Manfee server running on port', PORT);
+});
