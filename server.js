@@ -308,11 +308,28 @@ io.on('connection', socket => {
   });
 
   socket.on('take_seat', ({ code, seat }) => {
-    const room = rooms[code]; if(!room) return;
-    if(room.seats[seat]){ socket.emit('error_msg','Seat taken'); return; }
+    console.log('take_seat:', socket.id, socket.data.name, 'code:', code, 'seat:', seat);
+    const room = rooms[code];
+    if(!room){ 
+      console.log('take_seat: room not found for code:', code, '| Available:', Object.keys(rooms));
+      socket.emit('error_msg', 'Room not found: ' + code); 
+      return; 
+    }
+    if(seat < 0 || seat > 3){
+      socket.emit('error_msg', 'Invalid seat: ' + seat);
+      return;
+    }
+    if(room.seats[seat] && room.seats[seat].id !== socket.id){ 
+      socket.emit('error_msg','Seat ' + (seat+1) + ' is already taken');
+      return; 
+    }
+    // Remove player from any current seat or spectators
     room.seats = room.seats.map(s=>(s&&s.id===socket.id)?null:s);
     room.spectators = room.spectators.filter(s=>s.id!==socket.id);
-    room.seats[seat] = { id:socket.id, name:socket.data.name };
+    // Place in new seat
+    const playerName = socket.data.name || 'Unknown';
+    room.seats[seat] = { id:socket.id, name:playerName };
+    console.log('take_seat: success -', playerName, 'in seat', seat);
     broadcast(code);
     broadcastLobby();
   });
