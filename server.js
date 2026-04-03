@@ -416,7 +416,28 @@ io.on('connection', socket => {
       room.spectators.push(p);
       io.to(p.id).emit('kicked_to_spectator');
       broadcast(code);
+      broadcastLobby();
     }
+  });
+
+  socket.on('move_spec_to_seat', ({ code, playerId, seat }) => {
+    const room = rooms[code];
+    if (!room || room.host !== socket.id) return;
+    const seatNum = parseInt(seat);
+    if (isNaN(seatNum) || seatNum < 0 || seatNum > 3) return;
+    if (room.seats[seatNum]) { socket.emit('error_msg', 'Seat ' + (seatNum+1) + ' is already taken'); return; }
+    // Remove from spectators
+    const specIdx = room.spectators.findIndex(s => s.id === playerId);
+    if (specIdx < 0) { socket.emit('error_msg', 'Player not found in spectators'); return; }
+    const player = room.spectators.splice(specIdx, 1)[0];
+    // Also remove from any other seat (safety check)
+    room.seats = room.seats.map(s => (s && s.id === playerId) ? null : s);
+    // Place in seat
+    room.seats[seatNum] = { id: player.id, name: player.name };
+    console.log('Host moved', player.name, 'to seat', seatNum);
+    io.to(player.id).emit('moved_to_seat', { seat: seatNum });
+    broadcast(code);
+    broadcastLobby();
   });
 
   socket.on('start_game', ({ code }) => {
