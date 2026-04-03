@@ -542,6 +542,15 @@ io.on('connection', socket => {
     }, 300);
   });
 
+  socket.on('chat_msg', ({ code, msg }) => {
+    const room = rooms[code];
+    if (!room) return;
+    const name = socket.data.name || 'Player';
+    const clean = String(msg).slice(0, 80).replace(/</g, '&lt;');
+    // Broadcast to everyone in room EXCEPT sender
+    socket.to(code).emit('chat_msg', { name, msg: clean });
+  });
+
   socket.on('leave_room', ({ code }) => {
     handleLeave(socket, code);
   });
