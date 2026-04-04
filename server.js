@@ -1,3 +1,4 @@
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -547,8 +548,39 @@ io.on('connection', socket => {
     if (!room) return;
     const name = socket.data.name || 'Player';
     const clean = String(msg).slice(0, 80).replace(/</g, '&lt;');
-    // Broadcast to everyone in room EXCEPT sender
     socket.to(code).emit('chat_msg', { name, msg: clean });
+  });
+
+  // ── WebRTC Voice Signaling ──
+  // Relay offer/answer/ICE between peers in the same room
+  socket.on('voice_offer', ({ code, to, offer }) => {
+    // 'to' is target socket id, relay the offer with sender's id
+    socket.to(to).emit('voice_offer', { from: socket.id, offer });
+  });
+
+  socket.on('voice_answer', ({ code, to, answer }) => {
+    socket.to(to).emit('voice_answer', { from: socket.id, answer });
+  });
+
+  socket.on('voice_ice', ({ code, to, candidate }) => {
+    socket.to(to).emit('voice_ice', { from: socket.id, candidate });
+  });
+
+  // When someone joins a room, tell existing members to initiate calls to the new peer
+  socket.on('voice_join', ({ code }) => {
+    const room = rooms[code];
+    if (!room) return;
+    // Tell everyone else in room that a new peer joined (they should initiate offer)
+    socket.to(code).emit('voice_peer_joined', { peerId: socket.id });
+    // Tell the new peer who's already in the room
+    const members = [...(room.seats.filter(Boolean).map(s => s.id)),
+                     ...room.spectators.map(s => s.id)]
+                    .filter(id => id !== socket.id);
+    socket.emit('voice_existing_peers', { peerIds: members });
+  });
+
+  socket.on('voice_leave', ({ code }) => {
+    socket.to(code).emit('voice_peer_left', { peerId: socket.id });
   });
 
   socket.on('leave_room', ({ code }) => {
