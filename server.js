@@ -447,8 +447,8 @@ io.on('connection', socket => {
     if (room.host !== socket.id) { socket.emit('error_msg', 'Only the host can start'); return; }
     const seatedCount = room.seats.filter(Boolean).length;
     console.log('start_game: seated=', seatedCount, 'host=', socket.id === room.host);
-    if (seatedCount < 2) {
-      socket.emit('error_msg', 'Need at least 2 players seated to start');
+    if (seatedCount < 1) {
+      socket.emit('error_msg', 'Need at least 1 player seated to start');
       return;
     }
     // Fill empty seats with AI placeholders if less than 4
