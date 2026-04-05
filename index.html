@@ -401,7 +401,23 @@ html,body{height:100%;background:#060f09;}
 <body>
 <div id="app">
 
-<div id="s-name" class="scr on">
+<div id="s-auth" class="scr on" style="background:radial-gradient(ellipse at 50% 40%,#0a2a4a,#051525,#020d18);justify-content:center;align-items:center;">
+  <div style="width:90%;max-width:340px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:32px 24px;display:flex;flex-direction:column;gap:14px;">
+    <div style="font-size:32px;font-weight:900;color:#fff;text-align:center;letter-spacing:1px;">T - Teka</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.4);text-align:center;margin-top:-8px;">Afghan Card Game</div>
+    <div style="display:flex;background:rgba(255,255,255,.07);border-radius:10px;padding:3px;gap:3px;">
+      <button id="tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:9px;border:none;border-radius:8px;background:var(--gold);color:#0a1a08;font-size:12px;font-weight:700;cursor:pointer;">Login</button>
+      <button id="tab-signup" onclick="switchAuthTab('signup')" style="flex:1;padding:9px;border:none;border-radius:8px;background:none;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;">Sign Up</button>
+    </div>
+    <input class="auth-inp" id="auth-username" placeholder="Username" maxlength="20" autocomplete="username" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;outline:none;width:100%;box-sizing:border-box;">
+    <input class="auth-inp" id="auth-password" placeholder="Password (min 4 chars)" type="password" maxlength="40" autocomplete="current-password" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;outline:none;width:100%;box-sizing:border-box;">
+    <div id="auth-err" style="color:#ff6b6b;font-size:11px;text-align:center;min-height:16px;"></div>
+    <button id="auth-submit" onclick="submitAuth()" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:14px;color:#0a1a08;font-size:14px;font-weight:800;cursor:pointer;width:100%;">Login</button>
+    <div style="font-size:10px;color:rgba(255,255,255,.3);text-align:center;">Progress and credits saved to your account</div>
+  </div>
+</div>
+
+<div id="s-name" class="scr">
   <div class="home-bg">
     <div class="swirl s1"></div><div class="swirl s2"></div><div class="swirl s3"></div>
     <div class="fsym fs1">♠</div><div class="fsym fs2">♥</div><div class="fsym fs3">♣</div>
@@ -809,7 +825,7 @@ async function submitAuth(){
     // Pre-fill name for game
     var ni=document.getElementById('name-in');
     if(ni)ni.value=data.user.username;
-    go('s-home');
+    go('s-name');
     // Trigger button state update
     if(typeof updateHomeButtons==='function')updateHomeButtons();
   }catch(e){errEl.textContent='Connection error. Is the server running?';btn.disabled=false;btn.textContent=mode==='login'?'Login':'Create Account';}
