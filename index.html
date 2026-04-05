@@ -348,6 +348,54 @@ html,body{height:100%;background:#060f09;}
 .rdet{color:var(--tm);font-size:10px;margin-bottom:16px;white-space:pre-line;line-height:1.7;}
 .rbtn{background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:12px;padding:12px 24px;color:#0a1a08;font-size:13px;font-weight:800;cursor:pointer;margin:4px;box-shadow:0 4px 16px rgba(201,168,76,.3);}
 .rbtn.sec{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);}
+
+/* ── AUTH SCREENS ── */
+#s-auth{background:radial-gradient(ellipse at 50% 40%,#0a2a4a,#051525,#020d18);}
+.auth-box{width:90%;max-width:340px;margin:auto;padding:32px 24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;display:flex;flex-direction:column;gap:14px;}
+.auth-title{font-size:26px;font-weight:900;color:#fff;text-align:center;letter-spacing:1px;}
+.auth-sub{font-size:12px;color:rgba(255,255,255,.4);text-align:center;margin-top:-8px;}
+.auth-tabs{display:flex;background:rgba(255,255,255,.06);border-radius:10px;padding:3px;gap:3px;}
+.auth-tab{flex:1;padding:8px;border:none;border-radius:8px;background:none;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.auth-tab.active{background:var(--gold);color:#0a1a08;}
+.auth-inp{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;width:100%;box-sizing:border-box;}
+.auth-inp:focus{border-color:var(--gold);}
+.auth-inp::placeholder{color:rgba(255,255,255,.3);}
+.auth-btn{background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:13px;color:#0a1a08;font-size:14px;font-weight:800;cursor:pointer;width:100%;}
+.auth-err{color:#ff6b6b;font-size:11px;text-align:center;min-height:16px;}
+.auth-hint{font-size:10px;color:rgba(255,255,255,.3);text-align:center;}
+
+/* ── PLAYER BADGE ── */
+.player-badge{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,.06);border-radius:10px;border:1px solid rgba(255,255,255,.1);}
+.badge-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.badge-info{display:flex;flex-direction:column;gap:1px;}
+.badge-name{font-size:13px;font-weight:700;color:#fff;}
+.badge-level{font-size:10px;font-weight:600;}
+.badge-credits{font-size:10px;color:rgba(255,255,255,.5);}
+
+/* ── CREDIT POPUP ── */
+.credit-pop{position:fixed;top:60px;right:16px;background:rgba(10,26,8,.95);border:1px solid var(--gold);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;color:var(--gold);z-index:999;pointer-events:none;opacity:0;transform:translateY(-10px);transition:all .3s;}
+.credit-pop.show{opacity:1;transform:translateY(0);}
+
+/* ── LEADERBOARD ── */
+.lb-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);}
+.lb-rank{font-size:16px;font-weight:900;width:24px;text-align:center;color:rgba(255,255,255,.4);}
+.lb-rank.gold{color:#c9a84c;}
+.lb-rank.silver{color:#aaa;}
+.lb-rank.bronze{color:#cd7f32;}
+.lb-name{flex:1;font-size:13px;font-weight:600;color:#fff;}
+.lb-cred{font-size:12px;font-weight:700;color:var(--gold);}
+.lb-lvl{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;}
+
+/* ── PROFILE IN HOME ── */
+.home-profile{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.05);border-radius:12px;border:1px solid rgba(255,255,255,.08);margin-bottom:16px;}
+.hp-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;}
+.hp-info{flex:1;}
+.hp-name{font-size:15px;font-weight:700;color:#fff;}
+.hp-level{font-size:11px;font-weight:600;}
+.hp-credits{font-size:11px;color:rgba(255,255,255,.5);}
+.hp-logout{font-size:10px;color:rgba(255,255,255,.3);cursor:pointer;border:none;background:none;padding:4px 8px;border-radius:6px;}
+.hp-logout:hover{color:rgba(255,255,255,.6);}
+
 </style>
 </head>
 <body>
@@ -368,7 +416,16 @@ html,body{height:100%;background:#060f09;}
       <span class="hd-diamond">◆</span>
       <span class="hd-line"></span>
     </div>
-    <input class="home-ni" id="name-in" placeholder="Enter your name to play" maxlength="16" autocomplete="off">
+    <div id="home-profile-box" class="home-profile" style="display:none">
+      <div class="hp-av" id="hp-av" style="background:#1a3a7a;">?</div>
+      <div class="hp-info">
+        <div class="hp-name" id="hp-name">-</div>
+        <div class="hp-level" id="hp-level">Newcomer</div>
+        <div class="hp-credits" id="hp-credits">100 credits</div>
+      </div>
+      <button class="hp-logout" onclick="window._logout&&window._logout()">Logout</button>
+    </div>
+    <input class="home-ni" id="name-in" placeholder="Enter your name to play" maxlength="16" autocomplete="off" style="display:none">
     <div class="home-btns">
       <button class="home-main-btn online-btn" id="hbtn-online">
         <div class="hmb-icon">⊞</div>
@@ -395,7 +452,8 @@ html,body{height:100%;background:#060f09;}
   var ni = document.getElementById('name-in');
 
   function updateHomeButtons() {
-    var ok = ni && ni.value.trim().length >= 2;
+    var savedName = sessionStorage.getItem('tteka_name');
+    var ok = (ni && ni.value.trim().length >= 2) || (savedName && savedName.length >= 2);
     var ob = document.getElementById('hbtn-online');
     var ab = document.getElementById('hbtn-offline');
     if (ob) ob.classList.toggle('active', ok);
@@ -434,8 +492,8 @@ html,body{height:100%;background:#060f09;}
   // Play Online button
   var onlineBtn = document.getElementById('hbtn-online');
   if (onlineBtn) onlineBtn.addEventListener('click', function() {
-    var name = ni ? ni.value.trim() : '';
-    if (name.length < 2) { if(ni) ni.focus(); return; }
+    var name = (ni&&ni.value.trim().length>=2)?ni.value.trim():(sessionStorage.getItem('tteka_name')||'');
+    if (name.length < 2) { if(ni&&ni.style.display!=='none') ni.focus(); return; }
     window._pendingName = name;
     window._pendingAction = 'online';
     callWhenReady(window._doEnterLobby, [name]);
@@ -444,8 +502,8 @@ html,body{height:100%;background:#060f09;}
   // Play vs AI button
   var offlineBtn = document.getElementById('hbtn-offline');
   if (offlineBtn) offlineBtn.addEventListener('click', function() {
-    var name = ni ? ni.value.trim() : '';
-    if (name.length < 2) { if(ni) ni.focus(); return; }
+    var name = (ni&&ni.value.trim().length>=2)?ni.value.trim():(sessionStorage.getItem('tteka_name')||'');
+    if (name.length < 2) { return; }
     window._pendingName = name;
     window._pendingAction = 'offline';
     callWhenReady(window._doStartOffline, [name]);
@@ -616,6 +674,7 @@ html,body{height:100%;background:#060f09;}
   <!-- Message bar -->
   <div class="abar">
     <div class="amsg" id="g-msg">-</div>
+    <div id="my-credits-bar" style="font-size:10px;color:var(--gold);font-weight:700;flex-shrink:0;"></div>
     <button class="mic-btn off" id="g-mic-btn" title="Click to join voice chat" style="width:28px;height:28px;font-size:13px;flex-shrink:0;">🎤</button>
     <button class="abtn" id="g-menu-btn">⎋</button>
   </div>
@@ -642,6 +701,7 @@ html,body{height:100%;background:#060f09;}
 </div>
 <div id="ghost"><div class="cr" id="gcr"></div><div class="cs" id="gcs"></div></div>
 <div id="toast"></div>
+<div class="credit-pop" id="credit-pop"></div>
 
 <script>
 // Inject socket.io script tag with cache-busting timestamp to prevent 304
@@ -668,6 +728,147 @@ html,body{height:100%;background:#060f09;}
 })();
 </script>
 <script>
+/* ══════════════════════════════════════════════
+   AUTH + CREDITS SYSTEM
+══════════════════════════════════════════════ */
+var CURRENT_USER = null;
+var SERVER_URL = (window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')
+  ? 'http://localhost:3000' : window.location.origin;
+
+// Level color helper
+function levelColor(credits){
+  if(credits>=2000)return'#ff4444';if(credits>=1500)return'#ff6600';
+  if(credits>=1100)return'#ffaa00';if(credits>=800)return'#aacc00';
+  if(credits>=550)return'#44cc44';if(credits>=350)return'#00ccaa';
+  if(credits>=200)return'#00aaff';if(credits>=130)return'#6688ff';
+  if(credits>=100)return'#aaaaff';return'#888888';
+}
+function levelTitle(credits){
+  if(credits>=2000)return'Grand Master';if(credits>=1500)return'Master';
+  if(credits>=1100)return'Expert';if(credits>=800)return'Advanced';
+  if(credits>=550)return'Skilled';if(credits>=350)return'Experienced';
+  if(credits>=200)return'Intermediate';if(credits>=130)return'Learner';
+  if(credits>=100)return'Beginner';return'Newcomer';
+}
+function getLevelNum(credits){
+  var thresholds=[2000,1500,1100,800,550,350,200,130,100,0];
+  for(var i=0;i<thresholds.length;i++) if(credits>=thresholds[i]) return 10-i;
+  return 1;
+}
+
+function updateHomeProfile(user){
+  var box=document.getElementById('home-profile-box');
+  var ni=document.getElementById('name-in');
+  if(!box)return;
+  if(!user){box.style.display='none';if(ni)ni.style.display='';return;}
+  box.style.display='flex';
+  if(ni)ni.style.display='none';
+  var av=document.getElementById('hp-av');
+  var nm=document.getElementById('hp-name');
+  var lv=document.getElementById('hp-level');
+  var cr=document.getElementById('hp-credits');
+  var col=levelColor(user.credits||100);
+  if(av){av.textContent=(user.username||'?').slice(0,2).toUpperCase();av.style.background=col;}
+  if(nm)nm.textContent=user.username||'';
+  if(lv){lv.textContent='Lv.'+getLevelNum(user.credits||100)+' — '+levelTitle(user.credits||100);lv.style.color=col;}
+  if(cr)cr.textContent=(user.credits||100)+' credits';
+}
+
+function showCreditPop(amount, reason){
+  var el=document.getElementById('credit-pop');
+  if(!el)return;
+  var sign=amount>=0?'+':'';
+  el.textContent=sign+amount+' credits — '+reason;
+  el.style.color=amount>=0?'#c9a84c':'#ff6b6b';
+  el.style.borderColor=amount>=0?'#c9a84c':'#ff6b6b';
+  el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show');},3000);
+}
+
+async function submitAuth(){
+  var mode=document.getElementById('tab-login').classList.contains('active')?'login':'signup';
+  var username=document.getElementById('auth-username').value.trim();
+  var password=document.getElementById('auth-password').value;
+  var errEl=document.getElementById('auth-err');
+  var btn=document.getElementById('auth-submit');
+  if(!username||!password){errEl.textContent='Please fill in all fields';return;}
+  btn.textContent='Please wait...';btn.disabled=true;
+  try{
+    var res=await fetch(SERVER_URL+'/api/'+mode,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username,password})
+    });
+    var data=await res.json();
+    if(!data.ok){errEl.textContent=data.error||'Something went wrong';btn.disabled=false;btn.textContent=mode==='login'?'Login':'Create Account';return;}
+    // Success
+    CURRENT_USER=data.user;
+    localStorage.setItem('tteka_token',data.user.token);
+    localStorage.setItem('tteka_user',JSON.stringify(data.user));
+    sessionStorage.setItem('tteka_name',data.user.username);
+    updateHomeProfile(data.user);
+    // Pre-fill name for game
+    var ni=document.getElementById('name-in');
+    if(ni)ni.value=data.user.username;
+    go('s-home');
+    // Trigger button state update
+    if(typeof updateHomeButtons==='function')updateHomeButtons();
+  }catch(e){errEl.textContent='Connection error. Is the server running?';btn.disabled=false;btn.textContent=mode==='login'?'Login':'Create Account';}
+}
+
+function switchAuthTab(tab){
+  var loginTab=document.getElementById('tab-login');
+  var signupTab=document.getElementById('tab-signup');
+  var btn=document.getElementById('auth-submit');
+  if(tab==='login'){loginTab.classList.add('active');signupTab.classList.remove('active');btn.textContent='Login';}
+  else{signupTab.classList.add('active');loginTab.classList.remove('active');btn.textContent='Create Account';}
+  document.getElementById('auth-err').textContent='';
+}
+
+window._logout=function(){
+  CURRENT_USER=null;
+  localStorage.removeItem('tteka_token');
+  localStorage.removeItem('tteka_user');
+  sessionStorage.removeItem('tteka_name');
+  updateHomeProfile(null);
+  document.getElementById('auth-username').value='';
+  document.getElementById('auth-password').value='';
+  document.getElementById('auth-err').textContent='';
+  go('s-auth');
+};
+
+// Auto-login on page load
+(function autoLogin(){
+  var token=localStorage.getItem('tteka_token');
+  var cached=localStorage.getItem('tteka_user');
+  if(token&&cached){
+    try{
+      var user=JSON.parse(cached);
+      CURRENT_USER=user;
+      updateHomeProfile(user);
+      var ni=document.getElementById('name-in');
+      if(ni)ni.value=user.username;
+      sessionStorage.setItem('tteka_name',user.username);
+      if(typeof updateHomeButtons==='function')updateHomeButtons();
+      // Verify token in background
+      fetch(SERVER_URL+'/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})})
+        .then(function(r){return r.json();})
+        .then(function(data){
+          if(data.ok){CURRENT_USER=data.user;localStorage.setItem('tteka_user',JSON.stringify(data.user));updateHomeProfile(data.user);}
+          else{window._logout();}
+        }).catch(function(){});
+      // Don't redirect - stay on home screen if we have cached user
+    }catch(e){go('s-auth');}
+  } else {
+    go('s-auth');
+  }
+})();
+
+// Allow Enter key on auth inputs
+document.getElementById('auth-username').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('auth-password').focus();});
+document.getElementById('auth-password').addEventListener('keydown',function(e){if(e.key==='Enter')submitAuth();});
+
+// ── END AUTH ──────────────────────────────────────────────────────────
+
 /* ── GLOBAL STATE - declared first so all functions can use them ── */
 var ME = {name:'', id:''};
 var G = {};
@@ -697,8 +898,10 @@ function toast(msg){
 }
 
 window._doEnterLobby = function(name) {
-  sessionStorage.setItem('tteka_name', name);
-  ME.name = name;
+  var actualName = (CURRENT_USER && CURRENT_USER.username) ? CURRENT_USER.username : name;
+  sessionStorage.setItem('tteka_name', actualName);
+  ME.name = actualName;
+  if(CURRENT_USER){ ME.userId=CURRENT_USER.id; ME.credits=CURRENT_USER.credits; ME.level=CURRENT_USER.level; }
   var lav = document.getElementById('lob-av');
   var lnm = document.getElementById('lob-name');
   if(lav) lav.textContent = inits(name);
@@ -1465,7 +1668,7 @@ document.getElementById('btn-create').onclick=()=>{
   document.getElementById('cr-cancel').onclick=()=>ov.classList.remove('on');
   document.getElementById('cr-ok').onclick=()=>{
     let rname=document.getElementById('cr-name').value.trim()||`${ME.name}'s Room`;
-    socket.emit('create_room',{name:rname,mode:crMode,visibility:crVis,hostName:ME.name});
+    socket.emit('create_room',{name:rname,mode:crMode,visibility:crVis,hostName:ME.name,userId:ME.userId||null,credits:ME.credits||100,level:ME.level||null});
     IS_HOST=true;MY_SEAT=0;ov.classList.remove('on');
   };
 };
@@ -1473,7 +1676,7 @@ document.getElementById('btn-create').onclick=()=>{
 function joinRoom(code){
   console.log('joinRoom called:', code, 'ME.name:', ME.name, 'socket.connected:', socket.connected);
   if(window._li){clearInterval(window._li);window._li=null;}
-  socket.emit('join_room',{code:code.toUpperCase().trim(),playerName:ME.name});
+  socket.emit('join_room',{code:code.toUpperCase().trim(),playerName:ME.name,userId:ME.userId||null,credits:ME.credits||100,level:ME.level||null});
 }
 
 socket.on('room_created',({code})=>toast(`Room created! Code: ${code}`));
@@ -1484,6 +1687,14 @@ socket.on('kicked_from_room',()=>{toast('You were removed');go('s-lobby');loadRo
 socket.on('kicked_to_spectator',()=>{toast('Moved to spectator');MY_SEAT=-1;});
 socket.on('moved_to_seat',({seat})=>{MY_SEAT=seat;toast('Moved to Seat '+(seat+1));});
 socket.on('player_left',({name})=>rlog(`${name} left.`));
+socket.on('credits_update',({credits,level,change,reason})=>{
+  if(CURRENT_USER){CURRENT_USER.credits=credits;CURRENT_USER.level=level;localStorage.setItem('tteka_user',JSON.stringify(CURRENT_USER));updateHomeProfile(CURRENT_USER);}
+  showCreditPop(change,reason);
+  // Update scorebar credits display
+  let cb=document.getElementById('my-credits-bar');
+  if(cb)cb.textContent=credits+' cr';
+});
+
 socket.on('chat_msg',({name,msg})=>{
   addChatMsg(name,msg,false);
   if(document.getElementById('s-game').classList.contains('on')){
@@ -1538,6 +1749,7 @@ function renderSeat(i){
     el.className='seat'+(isMe?' mine':'');
     savEl.className='seat-av '+tc;savEl.textContent=inits(seat.name);
     snmEl.textContent=seat.name+(isMe?' (You)':'');
+    if(seat.level){snmEl.title='Lv.'+seat.level.level+' '+seat.level.title+' • '+( seat.credits||100)+' credits';}
     if(isMe){sbtEl.innerHTML='<button class="s-btn" onclick="leaveSeat()">Leave</button>';}
     else if(IS_HOST){sbtEl.innerHTML=`<button class="s-btn kick" onclick="kickSeat(${i})" title="Move to spectator">→ Spec</button>`;}
     else sbtEl.innerHTML='';
@@ -1587,7 +1799,7 @@ function takeSeat(i){
   if(!ROOM||!ROOM.code){toast('Not in a room');return;}
   if(ROOM.seats[i]&&ROOM.seats[i].id===socket.id)return;
   if(ROOM.seats[i]){toast('Seat taken');return;}
-  socket.emit('take_seat',{code:ROOM.code,seat:i});
+  socket.emit('take_seat',{code:ROOM.code,seat:i,userId:ME.userId||null,credits:ME.credits||100,level:ME.level||null});
 }
 function leaveSeat(){if(!ROOM)return;socket.emit('leave_seat',{code:ROOM.code});MY_SEAT=-1;}
 function kickSeat(i){if(!ROOM)return;socket.emit('kick_seat',{code:ROOM.code,seat:i});}
@@ -1827,6 +2039,9 @@ socket.on('voice_peer_left',({peerId})=>{
 /* posSlots moved outside initGame */
 
 socket.on('game_start',({room,seatOrder})=>{
+  // Show credits in abar
+  let cb=document.getElementById('my-credits-bar');
+  if(cb&&CURRENT_USER) cb.textContent=(CURRENT_USER.credits||100)+' cr';
   ROOM=room;MY_SEAT=seatOrder.findIndex(s=>s.id===socket.id);
   G={mode:room.mode,scores:[0,0],round:1,dealer:-1,seatOrder,hand:[],bids:[-1,-1,-1,-1],teamTarget:[-1,-1],roundPts:1,dealerDecision:'accept',tr:[0,0,0,0],tk:[null,null,null,null],led:null,turn:-1,phase:'waiting',tc:0,switched:false,firstPlayer:-1,trump:room.mode==='kash'?null:'S',otherHands:[0,0,0,0]};
   go('s-game');setupGameUI();
