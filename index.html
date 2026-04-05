@@ -9,12 +9,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Manfee">
+<meta name="apple-mobile-web-app-title" content="T - Teka">
 <meta name="theme-color" content="#051525">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manfee</title>
+<title>T - Teka</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif;}
 :root{
@@ -356,7 +356,7 @@ html,body{height:100%;background:#060f09;}
     <div class="fsym fs4">♦</div><div class="fsym fs5">♠</div><div class="fsym fs6">♦</div>
   </div>
   <div class="home-content">
-    <div class="home-title">Manfee</div>
+    <div <div class="home-title">T - Teka</div>
     <div class="home-divider">
       <span class="hd-line"></span>
       <span class="hd-diamond">◆</span>
@@ -527,7 +527,7 @@ html,body{height:100%;background:#060f09;}
       <div class="g-sneed" id="gbd0">—</div>
     </div>
     <div class="g-center-info">
-      <div class="g-mode" id="g-mode-badge">MANFEE</div>
+      <div class="g-mode" id="g-mode-badge">T-TEKA</div>
       <div class="g-round-info">Rd <span id="g-round">1</span> · D:<span id="g-dealer" style="color:var(--gold)">?</span></div>
     </div>
     <div class="g-scoreblock right">
@@ -728,7 +728,7 @@ function showOfflinePicker() {
     <h3 style="text-align:center;margin-bottom:8px;color:#fff;">Play vs AI</h3>
     <p style="color:rgba(255,255,255,.4);font-size:11px;text-align:center;margin-bottom:16px;">Choose a game mode</p>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button class="gbtn off-mode-btn" data-mode="manfee" style="background:linear-gradient(135deg,#1a3a6e,#0d2045);color:#fff;border:1.5px solid rgba(100,160,255,.4);line-height:1.8;">♠ Afghani Manfee<br><small style="font-weight:400;opacity:.6">Spades trump · Bid &amp; switch</small></button>
+      <button class="gbtn off-mode-btn" data-mode="manfee" style="background:linear-gradient(135deg,#1a3a6e,#0d2045);color:#fff;border:1.5px solid rgba(100,160,255,.4);line-height:1.8;">♠ T - Teka<br><small style="font-weight:400;opacity:.6">Spades trump · Bid &amp; switch</small></button>
       <button class="gbtn off-mode-btn" data-mode="kash" style="background:linear-gradient(135deg,#2d1f6e,#1a1045);color:#fff;border:1.5px solid rgba(180,100,255,.4);line-height:1.8;">♥ Kash<br><small style="font-weight:400;opacity:.6">No trump · Highest card wins</small></button>
       <button class="gbtn off-mode-btn" data-mode="teka" style="background:linear-gradient(135deg,#1f3a1a,#0d2010);color:#fff;border:1.5px solid rgba(100,200,100,.4);line-height:1.8;">♦ Teka<br><small style="font-weight:400;opacity:.6">Fixed 7 vs 6 bid split</small></button>
     </div>
@@ -1434,7 +1434,7 @@ document.getElementById('btn-create').onclick=()=>{
   ov.innerHTML=`<div class="modal"><h3>Create a Room</h3>
     <div class="field"><label>ROOM NAME</label><input id="cr-name" placeholder="e.g. Friday Night Game" maxlength="24"></div>
     <div class="field"><label>GAME MODE</label><div class="tog-row">
-      <div class="tog sel" data-mode="manfee">Manfee</div>
+      <div class="tog sel" data-mode="manfee">T-Teka</div>
       <div class="tog" data-mode="kash">Kash</div>
       <div class="tog" data-mode="teka">Teka</div>
     </div></div>
@@ -1502,7 +1502,7 @@ socket.on('rooms_list', rooms => {
 
 function openRoom(){
   document.getElementById('rm-title').textContent=ROOM.name;
-  document.getElementById('rm-mode').textContent=ROOM.mode==='manfee'?'Afghani Manfee ♠':ROOM.mode==='kash'?'Kash ♥':'Teka ♦';
+  document.getElementById('rm-mode').textContent=ROOM.mode==='manfee'?'T - Teka ♠':ROOM.mode==='kash'?'Kash ♥':'Teka ♦';
   document.getElementById('rm-code').textContent=ROOM.code;
   document.getElementById('rm-code').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(ROOM.code);toast('Code copied: '+ROOM.code);};
   go('s-room');renderRoom();
@@ -1830,7 +1830,7 @@ function setupGameUI(){
   document.getElementById('pav1').textContent=inits(names[1]);
   document.getElementById('pnm3').textContent=names[3];
   document.getElementById('pav3').textContent=inits(names[3]);
-  document.getElementById('g-mode-badge').textContent=G.mode==='manfee'?'MANFEE':G.mode==='kash'?'KASH':'TEKA';
+  document.getElementById('g-mode-badge').textContent=G.mode==='manfee'?'T-TEKA':G.mode==='kash'?'KASH':'TEKA';
   document.getElementById('g-tri').style.display=G.trump?'':'none';
   renderScore();
   document.getElementById('g-menu-btn').onclick=()=>{if(confirm('Leave game?')){socket.emit('leave_room',{code:ROOM?.code});go('s-lobby');loadRooms();}};
