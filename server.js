@@ -443,9 +443,17 @@ io.on('connection', socket => {
   socket.on('start_game', ({ code }) => {
     const room = rooms[code];
     if (!room || room.host !== socket.id) return;
-    if (room.seats.filter(Boolean).length < 4) {
-      socket.emit('error_msg', 'Need 4 players seated to start');
+    const seatedCount = room.seats.filter(Boolean).length;
+    console.log('start_game: seated=', seatedCount, 'host=', socket.id === room.host);
+    if (seatedCount < 2) {
+      socket.emit('error_msg', 'Need at least 2 players seated to start');
       return;
+    }
+    // Fill empty seats with AI placeholders if less than 4
+    for (let i = 0; i < 4; i++) {
+      if (!room.seats[i]) {
+        room.seats[i] = { id: 'ai_'+i, name: ['Cyrus','Arash','Bilal','Zaid'][i] };
+      }
     }
     room.started = true;
     room.game = { round: 0, scores: [0, 0], dealer: -1 };
