@@ -442,7 +442,9 @@ io.on('connection', socket => {
 
   socket.on('start_game', ({ code }) => {
     const room = rooms[code];
-    if (!room || room.host !== socket.id) return;
+    console.log('start_game received from', socket.id, 'room host:', room?.host, 'match:', room?.host === socket.id, 'code:', code);
+    if (!room) { socket.emit('error_msg', 'Room not found'); return; }
+    if (room.host !== socket.id) { socket.emit('error_msg', 'Only the host can start'); return; }
     const seatedCount = room.seats.filter(Boolean).length;
     console.log('start_game: seated=', seatedCount, 'host=', socket.id === room.host);
     if (seatedCount < 2) {
