@@ -15,9 +15,20 @@ const io = new Server(server, {
 
 const rooms = {};
 
-// Health check
+// Serve the game - looks for index.html in same folder or public/ subfolder
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 app.get('/', (req, res) => {
-  res.send('Manfee server is running. Rooms: ' + Object.keys(rooms).length);
+  const paths = [
+    path.join(__dirname, 'public', 'index.html'),
+    path.join(__dirname, 'index.html'),
+  ];
+  const found = paths.find(p => fs.existsSync(p));
+  if (found) {
+    res.sendFile(found);
+  } else {
+    res.send('Manfee server is running. Add index.html to the project folder.');
+  }
 });
 
 // Serve socket.io client with no-cache headers
