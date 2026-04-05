@@ -446,6 +446,13 @@ html,body{height:100%;background:#060f09;}
     window._pendingAction = 'offline';
     callWhenReady(window._doStartOffline, [name]);
   });
+
+  // Auto-restore name from previous session
+  var saved = sessionStorage.getItem('tteka_name');
+  if(saved && saved.length >= 2 && ni){
+    ni.value = saved;
+    updateHomeButtons();
+  }
 })();
 </script>
 
@@ -686,6 +693,7 @@ function toast(msg){
 }
 
 window._doEnterLobby = function(name) {
+  sessionStorage.setItem('tteka_name', name);
   ME.name = name;
   var lav = document.getElementById('lob-av');
   var lnm = document.getElementById('lob-name');
@@ -714,6 +722,7 @@ window._doStartOffline = function(name) {
   ME.name = name;
   ME.id = 'offline_' + Math.random().toString(36).slice(2);
   window._offlineName = name;
+  sessionStorage.setItem('tteka_name', name);
   showOfflinePicker();
 };
 
