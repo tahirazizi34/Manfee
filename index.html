@@ -358,6 +358,30 @@ html,body{height:100%;background:#060f09;}
 .hp-level{font-size:10px;font-weight:600;}
 .hp-credits{font-size:10px;color:rgba(255,255,255,.5);}
 .hp-logout{font-size:10px;color:rgba(255,255,255,.35);cursor:pointer;border:1px solid rgba(255,255,255,.15);background:none;padding:4px 8px;border-radius:6px;}
+
+/* ── BLACKJACK ── */
+.bj-card{width:52px;height:78px;background:#fff;border-radius:8px;display:flex;flex-direction:column;align-items:flex-start;padding:5px;margin:0 -6px;box-shadow:0 3px 10px rgba(0,0,0,.6);flex-shrink:0;border:1.5px solid #c9a84c;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='white'/%3E%3Cpath d='M6 0L12 6L6 12L0 6Z' fill='none' stroke='%23c9a84c' stroke-width='0.5' opacity='0.35'/%3E%3Ccircle cx='6' cy='6' r='1.5' fill='%23c9a84c' opacity='0.2'/%3E%3C/svg%3E");}
+.bj-card.face-down{background:#1a3a6e;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Crect width='10' height='10' fill='%231a3a6e'/%3E%3Cpath d='M5 0L10 5L5 10L0 5Z' fill='none' stroke='%23c9a84c' stroke-width='0.5' opacity='0.5'/%3E%3C/svg%3E");}
+.bj-card .bj-rank{font-size:15px;font-weight:800;line-height:1;}
+.bj-card .bj-suit{font-size:11px;line-height:1;}
+.bj-card .bj-center{font-size:26px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.bj-card.spd .bj-rank,.bj-card.spd .bj-suit{color:#1a3a7a;}
+.bj-card.clb .bj-rank,.bj-card.clb .bj-suit{color:#1a6e2e;}
+.bj-card.hrt .bj-rank,.bj-card.hrt .bj-suit{color:#cc2222;}
+.bj-card.dia .bj-rank,.bj-card.dia .bj-suit{color:#cc5500;}
+.bj-card.active-hand{border-color:#c9a84c;box-shadow:0 0 12px rgba(201,168,76,.6);}
+.bj-chip{width:46px;height:46px;border-radius:50%;border:3px solid rgba(255,255,255,.3);background:linear-gradient(135deg,#8b0000,#cc0000);color:#fff;font-size:12px;font-weight:800;cursor:pointer;transition:transform .1s;}
+.bj-chip:active{transform:scale(.9);}
+.bj-chip:nth-child(2){background:linear-gradient(135deg,#005500,#008800);}
+.bj-chip:nth-child(3){background:linear-gradient(135deg,#000066,#0000aa);}
+.bj-chip:nth-child(4){background:linear-gradient(135deg,#444,#888);}
+.bj-chip:nth-child(5){background:linear-gradient(135deg,#663300,#996600);}
+.bj-action-btn{flex:1;padding:10px 4px;border:none;border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;min-width:60px;}
+.bj-action-btn:hover{background:rgba(255,255,255,.2);}
+.bj-dbl{background:rgba(201,168,76,.25);color:#c9a84c;}
+.bj-spl{background:rgba(100,200,255,.2);color:#80ccff;}
+.bj-ins{background:rgba(255,100,100,.2);color:#ff8080;}
+
 </style>
 </head>
 <body>
@@ -693,6 +717,85 @@ html,body{height:100%;background:#060f09;}
   <div class="gov" id="gov-mem"><div class="gmodal"><h2>Cards Switched!</h2><div class="gmsub" id="gmem-sub"></div><div class="mem-cards" id="gmem-cards"></div><div class="mem-timer" id="gmem-timer">30</div><button class="gcbtn" id="btn-mem-ok">Ready — Start Play</button></div></div>
 </div>
 
+<div id="s-blackjack" class="scr" style="background:radial-gradient(ellipse at 50% 40%,#0a2a0a,#051505,#010d01);display:none;flex-direction:column;height:100vh;overflow:hidden;">
+  <!-- Top bar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(0,0,0,.4);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;">
+    <button id="bj-menu" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;">⎋</button>
+    <div style="font-size:13px;font-weight:700;color:#fff;">♠ Blackjack</div>
+    <div style="text-align:right;">
+      <div style="font-size:10px;color:rgba(255,255,255,.4);">CREDITS</div>
+      <div id="bj-credits" style="font-size:14px;font-weight:800;color:#c9a84c;">100</div>
+    </div>
+  </div>
+
+  <!-- Dealer area -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:10px 14px;gap:8px;overflow:hidden;">
+    <div style="text-align:center;">
+      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">DEALER</div>
+      <div id="bj-dealer-score" style="font-size:13px;font-weight:700;color:#fff;min-height:18px;"></div>
+      <div id="bj-dealer-cards" style="display:flex;justify-content:center;gap:-8px;flex-wrap:nowrap;min-height:80px;align-items:center;margin-top:4px;"></div>
+    </div>
+
+    <!-- Message -->
+    <div id="bj-msg" style="text-align:center;font-size:15px;font-weight:700;color:#fff;min-height:22px;padding:4px;"></div>
+
+    <!-- Player area -->
+    <div>
+      <div style="text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">YOU</div>
+        <div id="bj-player-score" style="font-size:13px;font-weight:700;color:#fff;min-height:18px;"></div>
+        <div id="bj-player-cards" style="display:flex;justify-content:center;gap:-8px;flex-wrap:nowrap;min-height:80px;align-items:center;margin-top:4px;"></div>
+      </div>
+      <!-- Split hand -->
+      <div id="bj-split-area" style="display:none;margin-top:8px;text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:2px;">SPLIT HAND</div>
+        <div id="bj-split-score" style="font-size:13px;font-weight:700;color:#fff;min-height:18px;"></div>
+        <div id="bj-split-cards" style="display:flex;justify-content:center;flex-wrap:nowrap;min-height:80px;align-items:center;margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bet area (shown before deal) -->
+  <div id="bj-bet-area" style="flex-shrink:0;padding:10px 14px;background:rgba(0,0,0,.4);border-top:1px solid rgba(255,255,255,.08);">
+    <div style="font-size:10px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:8px;">PLACE YOUR BET</div>
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:10px;">
+      <button class="bj-chip" data-bet="5">5</button>
+      <button class="bj-chip" data-bet="10">10</button>
+      <button class="bj-chip" data-bet="25">25</button>
+      <button class="bj-chip" data-bet="50">50</button>
+      <button class="bj-chip" data-bet="100">100</button>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);">CURRENT BET</div>
+        <div id="bj-bet-display" style="font-size:22px;font-weight:900;color:#c9a84c;">0</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button id="bj-clear-bet" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:8px 12px;color:rgba(255,255,255,.6);font-size:11px;cursor:pointer;">Clear</button>
+        <button id="bj-deal-btn" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:10px 24px;color:#0a1a08;font-size:13px;font-weight:800;cursor:pointer;">DEAL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action buttons (shown during play) -->
+  <div id="bj-action-area" style="display:none;flex-shrink:0;padding:10px 14px;background:rgba(0,0,0,.4);border-top:1px solid rgba(255,255,255,.08);">
+    <div style="text-align:center;margin-bottom:8px;">
+      <span style="font-size:10px;color:rgba(255,255,255,.4);">BET: </span>
+      <span id="bj-current-bet-lbl" style="font-size:13px;font-weight:700;color:#c9a84c;">0</span>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button id="bj-hit" class="bj-action-btn">HIT</button>
+      <button id="bj-stand" class="bj-action-btn">STAND</button>
+      <button id="bj-double" class="bj-action-btn bj-dbl">DOUBLE</button>
+      <button id="bj-split" class="bj-action-btn bj-spl" style="display:none;">SPLIT</button>
+      <button id="bj-insurance" class="bj-action-btn bj-ins" style="display:none;">INSURE</button>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+      <button id="bj-next-hand" style="display:none;background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:10px 32px;color:#0a1a08;font-size:13px;font-weight:800;cursor:pointer;">Next Hand</button>
+    </div>
+  </div>
+</div>
+
 <div id="s-result" class="scr">
   <div class="rcard"><h2 id="res-title">Round Over</h2><div class="rwin" id="res-win"></div><div class="rsc"><div><div class="rsn">TEAM A</div><div class="rsv" id="res-s0">0</div></div><div><div class="rsn">TEAM B</div><div class="rsv" id="res-s1">0</div></div></div><div class="rdet" id="res-det"></div><button class="rbtn" id="res-next">Next Round</button><button class="rbtn sec" id="res-lobby">Back to Lobby</button></div>
 </div>
@@ -939,6 +1042,12 @@ function startOfflineGame(mode) {
   if (ov) ov.classList.remove('on');
   console.log('initOfflineGame type:', typeof initOfflineGame);
   console.log('ME:', JSON.stringify(ME));
+  if(mode==='blackjack'){
+    if(typeof initBlackjack==='function') initBlackjack();
+    else if(typeof window.initBlackjack==='function') window.initBlackjack();
+    else setTimeout(function(){startOfflineGame('blackjack');},300);
+    return;
+  }
   if (typeof initOfflineGame === 'function') {
     try {
       initOfflineGame(mode);
@@ -2432,6 +2541,7 @@ window.addEventListener('resize',()=>{if(document.getElementById('s-game').class
 // Expose to global scope
 window.socket = socket;
 window.joinRoom = joinRoom;
+window.initBlackjack = initBlackjack;
 // ROOM exposed via window._getRoom()
 window.takeSeat = takeSeat;
 window.leaveSeat = leaveSeat;
@@ -2444,6 +2554,443 @@ window._startGame = function(){
   if(!ROOM){ alert('Not in a room'); return; }
   socket.emit('start_game', {code: ROOM.code});
 };
+
+
+/* ══════════════════════════════════════════════
+   BLACKJACK ENGINE
+   Rules: Standard Vegas rules
+   - Dealer hits soft 17
+   - Blackjack pays 3:2
+   - Insurance pays 2:1
+   - Double down on any 2 cards
+   - Split up to 3 times (not aces)
+   - Split aces get 1 card each
+══════════════════════════════════════════════ */
+
+var BJ = {
+  deck: [], dealerHand: [], playerHand: [], splitHand: [],
+  bet: 0, insuranceBet: 0, splitBet: 0,
+  credits: 100, phase: 'bet', // bet | play | split-play | dealer | done
+  playingSplit: false, splitDone: false,
+  lastBet: 10
+};
+
+var BJ_SUITS = ['spd','hrt','dia','clb'];
+var BJ_SUIT_SYM = {spd:'♠', hrt:'♥', dia:'♦', clb:'♣'};
+var BJ_RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+
+function bjMakeDeck(numDecks) {
+  numDecks = numDecks || 6;
+  var d = [];
+  for (var n = 0; n < numDecks; n++) {
+    for (var s = 0; s < BJ_SUITS.length; s++) {
+      for (var r = 0; r < BJ_RANKS.length; r++) {
+        d.push({ r: BJ_RANKS[r], s: BJ_SUITS[s] });
+      }
+    }
+  }
+  // Shuffle
+  for (var i = d.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = d[i]; d[i] = d[j]; d[j] = tmp;
+  }
+  return d;
+}
+
+function bjCardValue(card) {
+  if (card.r === 'A') return 11;
+  if (['J','Q','K'].indexOf(card.r) >= 0) return 10;
+  return parseInt(card.r);
+}
+
+function bjHandValue(hand) {
+  var val = 0, aces = 0;
+  for (var i = 0; i < hand.length; i++) {
+    if (hand[i].hidden) continue;
+    val += bjCardValue(hand[i]);
+    if (hand[i].r === 'A') aces++;
+  }
+  while (val > 21 && aces > 0) { val -= 10; aces--; }
+  return val;
+}
+
+function bjIsSoft(hand) {
+  var val = 0, aces = 0;
+  for (var i = 0; i < hand.length; i++) {
+    if (hand[i].hidden) continue;
+    val += bjCardValue(hand[i]);
+    if (hand[i].r === 'A') aces++;
+  }
+  return aces > 0 && val <= 21 && (val - 10) <= 21;
+}
+
+function bjIsBlackjack(hand) {
+  return hand.length === 2 && bjHandValue(hand) === 21;
+}
+
+function bjDeal(card, hidden) {
+  if (BJ.deck.length < 20) BJ.deck = bjMakeDeck(6);
+  var c = BJ.deck.pop();
+  if (hidden) c.hidden = true;
+  return c;
+}
+
+function bjScoreLabel(hand) {
+  var v = bjHandValue(hand);
+  var soft = bjIsSoft(hand) && v < 21;
+  if (v > 21) return 'BUST (' + v + ')';
+  if (bjIsBlackjack(hand)) return 'BLACKJACK!';
+  return (soft ? 'Soft ' : '') + v;
+}
+
+function bjCardHTML(card) {
+  if (card.hidden) {
+    return '<div class="bj-card face-down" style="position:relative;"></div>';
+  }
+  var sym = BJ_SUIT_SYM[card.s] || '?';
+  return '<div class="bj-card ' + card.s + '" style="position:relative;">' +
+    '<div class="bj-rank">' + card.r + '</div>' +
+    '<div class="bj-suit">' + sym + '</div>' +
+    '<div class="bj-center">' + sym + '</div>' +
+    '</div>';
+}
+
+function bjRender() {
+  // Dealer
+  var dEl = document.getElementById('bj-dealer-cards');
+  var dsEl = document.getElementById('bj-dealer-score');
+  if (dEl) dEl.innerHTML = BJ.dealerHand.map(bjCardHTML).join('');
+  if (dsEl) {
+    var hasHidden = BJ.dealerHand.some(function(c){return c.hidden;});
+    dsEl.textContent = hasHidden ? '' : bjScoreLabel(BJ.dealerHand);
+  }
+
+  // Player
+  var pEl = document.getElementById('bj-player-cards');
+  var psEl = document.getElementById('bj-player-score');
+  if (pEl) pEl.innerHTML = BJ.playerHand.map(bjCardHTML).join('');
+  if (psEl) psEl.textContent = BJ.phase !== 'bet' ? bjScoreLabel(BJ.playerHand) : '';
+
+  // Split hand
+  var splitArea = document.getElementById('bj-split-area');
+  if (splitArea) {
+    if (BJ.splitHand.length > 0) {
+      splitArea.style.display = '';
+      var spEl = document.getElementById('bj-split-cards');
+      var spScEl = document.getElementById('bj-split-score');
+      if (spEl) spEl.innerHTML = BJ.splitHand.map(bjCardHTML).join('');
+      if (spScEl) spScEl.textContent = bjScoreLabel(BJ.splitHand);
+      // Highlight active hand
+      if (pEl) pEl.querySelectorAll('.bj-card').forEach(function(c){c.classList.toggle('active-hand', !BJ.playingSplit);});
+      if (spEl) spEl.querySelectorAll('.bj-card').forEach(function(c){c.classList.toggle('active-hand', BJ.playingSplit);});
+    } else {
+      splitArea.style.display = 'none';
+    }
+  }
+
+  // Credits
+  var crEl = document.getElementById('bj-credits');
+  if (crEl) crEl.textContent = BJ.credits;
+  var betEl = document.getElementById('bj-bet-display');
+  if (betEl) betEl.textContent = BJ.bet;
+  var betLbl = document.getElementById('bj-current-bet-lbl');
+  if (betLbl) betLbl.textContent = BJ.bet;
+}
+
+function bjMsg(msg, color) {
+  var el = document.getElementById('bj-msg');
+  if (el) { el.textContent = msg; el.style.color = color || '#fff'; }
+}
+
+function bjShowBet() {
+  BJ.phase = 'bet';
+  document.getElementById('bj-bet-area').style.display = '';
+  document.getElementById('bj-action-area').style.display = 'none';
+  document.getElementById('bj-next-hand').style.display = 'none';
+  bjMsg('');
+  bjRender();
+}
+
+function bjUpdateActions() {
+  var hand = BJ.playingSplit ? BJ.splitHand : BJ.playerHand;
+  var val = bjHandValue(hand);
+  var canDouble = hand.length === 2 && BJ.credits >= BJ.bet;
+  var canSplit = hand.length === 2 && hand[0].r === hand[1].r && BJ.credits >= BJ.bet && BJ.splitHand.length === 0 && !BJ.playingSplit;
+  var dealerAce = BJ.dealerHand[0] && BJ.dealerHand[0].r === 'A';
+  var canInsure = dealerAce && BJ.phase === 'play' && BJ.playerHand.length === 2 && BJ.insuranceBet === 0;
+
+  document.getElementById('bj-double').style.display = canDouble ? '' : 'none';
+  document.getElementById('bj-split').style.display = canSplit ? '' : 'none';
+  document.getElementById('bj-insurance').style.display = canInsure ? '' : 'none';
+  document.getElementById('bj-hit').disabled = val >= 21;
+}
+
+function bjStartHand() {
+  if (BJ.bet === 0) { bjMsg('Place a bet first!', '#ff6b6b'); return; }
+  if (BJ.credits < BJ.bet) { bjMsg('Not enough credits!', '#ff6b6b'); return; }
+
+  BJ.credits -= BJ.bet;
+  BJ.phase = 'play';
+  BJ.insuranceBet = 0;
+  BJ.splitBet = 0;
+  BJ.splitHand = [];
+  BJ.playingSplit = false;
+  BJ.splitDone = false;
+
+  // Deal initial cards
+  BJ.playerHand = [bjDeal(), bjDeal()];
+  BJ.dealerHand = [bjDeal(), bjDeal(null, true)]; // second card hidden
+
+  document.getElementById('bj-bet-area').style.display = 'none';
+  document.getElementById('bj-action-area').style.display = '';
+
+  bjRender();
+  bjMsg('');
+
+  // Check player blackjack
+  if (bjIsBlackjack(BJ.playerHand)) {
+    // Reveal dealer card
+    BJ.dealerHand[1].hidden = false;
+    bjRender();
+    if (bjIsBlackjack(BJ.dealerHand)) {
+      bjMsg('Push — both have Blackjack!', '#f39c12');
+      BJ.credits += BJ.bet;
+    } else {
+      var bj_win = Math.floor(BJ.bet * 2.5);
+      BJ.credits += bj_win;
+      bjMsg('BLACKJACK! You win ' + Math.floor(BJ.bet * 1.5) + '!', '#c9a84c');
+    }
+    bjEndHand();
+    return;
+  }
+
+  bjUpdateActions();
+}
+
+function bjHit() {
+  var hand = BJ.playingSplit ? BJ.splitHand : BJ.playerHand;
+  hand.push(bjDeal());
+  var val = bjHandValue(hand);
+  bjRender();
+  bjUpdateActions();
+
+  if (val > 21) {
+    bjMsg((BJ.playingSplit ? 'Split hand ' : 'You ') + 'BUST!', '#ff6b6b');
+    if (BJ.playingSplit) {
+      BJ.splitDone = true;
+      bjDealerPlay();
+    } else if (BJ.splitHand.length > 0 && !BJ.splitDone) {
+      // Switch to split hand
+      BJ.playingSplit = true;
+      bjMsg('Split hand — your turn!', '#80ccff');
+      bjRender();
+      bjUpdateActions();
+    } else {
+      bjDealerPlay();
+    }
+  } else if (val === 21) {
+    bjStand();
+  }
+}
+
+function bjStand() {
+  if (BJ.splitHand.length > 0 && !BJ.playingSplit && !BJ.splitDone) {
+    BJ.playingSplit = true;
+    bjMsg('Split hand — your turn!', '#80ccff');
+    bjRender();
+    bjUpdateActions();
+  } else {
+    bjDealerPlay();
+  }
+}
+
+function bjDouble() {
+  var hand = BJ.playingSplit ? BJ.splitHand : BJ.playerHand;
+  BJ.credits -= BJ.bet;
+  if (BJ.playingSplit) BJ.splitBet = BJ.bet * 2;
+  else BJ.bet *= 2;
+  document.getElementById('bj-current-bet-lbl').textContent = BJ.bet;
+  hand.push(bjDeal());
+  bjRender();
+  var val = bjHandValue(hand);
+  if (val > 21) bjMsg('Bust!', '#ff6b6b');
+  bjStand();
+}
+
+function bjSplit() {
+  // Split the hand
+  BJ.credits -= BJ.bet;
+  BJ.splitBet = BJ.bet;
+  BJ.splitHand = [BJ.playerHand.pop(), bjDeal()];
+  BJ.playerHand.push(bjDeal());
+  BJ.playingSplit = false;
+  bjRender();
+  bjMsg('Split! Play your first hand.', '#80ccff');
+  bjUpdateActions();
+
+  // Special: split aces - each gets only 1 card
+  if (BJ.playerHand[0].r === 'A') {
+    bjMsg('Aces split — one card each.', '#80ccff');
+    setTimeout(bjDealerPlay, 600);
+  }
+}
+
+function bjInsurance() {
+  BJ.insuranceBet = Math.floor(BJ.bet / 2);
+  BJ.credits -= BJ.insuranceBet;
+  bjMsg('Insurance placed: ' + BJ.insuranceBet, '#ff8080');
+  document.getElementById('bj-insurance').style.display = 'none';
+  bjRender();
+}
+
+function bjDealerPlay() {
+  BJ.phase = 'dealer';
+  document.getElementById('bj-hit').disabled = true;
+  document.getElementById('bj-stand').disabled = true;
+  document.getElementById('bj-double').style.display = 'none';
+  document.getElementById('bj-split').style.display = 'none';
+  document.getElementById('bj-insurance').style.display = 'none';
+
+  // Reveal hidden card
+  BJ.dealerHand.forEach(function(c){ c.hidden = false; });
+  bjRender();
+
+  // Check insurance
+  if (BJ.insuranceBet > 0 && bjIsBlackjack(BJ.dealerHand)) {
+    BJ.credits += BJ.insuranceBet * 3; // insurance pays 2:1 → get back 3x
+    bjMsg('Insurance wins!', '#ff8080');
+  } else if (BJ.insuranceBet > 0) {
+    bjMsg('Insurance lost.', '#ff6b6b');
+  }
+
+  setTimeout(bjDealerDraw, 600);
+}
+
+function bjDealerDraw() {
+  var dVal = bjHandValue(BJ.dealerHand);
+  var isSoft17 = bjIsSoft(BJ.dealerHand) && dVal === 17;
+  // Dealer hits on soft 17
+  if (dVal < 17 || isSoft17) {
+    BJ.dealerHand.push(bjDeal());
+    bjRender();
+    setTimeout(bjDealerDraw, 500);
+  } else {
+    bjResolve();
+  }
+}
+
+function bjResolve() {
+  var dVal = bjHandValue(BJ.dealerHand);
+  var pVal = bjHandValue(BJ.playerHand);
+  var spVal = BJ.splitHand.length > 0 ? bjHandValue(BJ.splitHand) : -1;
+  var pBust = pVal > 21;
+  var dBust = dVal > 21;
+  var msgs = [];
+  var totalWin = 0;
+
+  function resolveOne(val, bet, label) {
+    if (val > 21) { msgs.push((label?label+': ':'')+'Bust'); return 0; }
+    if (dBust || val > dVal) { msgs.push((label?label+': ':'')+'WIN +'+bet); return bet * 2; }
+    if (val === dVal) { msgs.push((label?label+': ':'')+'Push'); return bet; }
+    msgs.push((label?label+': ':'')+'Lost');
+    return 0;
+  }
+
+  totalWin += resolveOne(pVal, BJ.bet, BJ.splitHand.length > 0 ? 'Hand 1' : '');
+  if (spVal >= 0) totalWin += resolveOne(spVal, BJ.splitBet || BJ.bet, 'Hand 2');
+
+  BJ.credits += totalWin;
+  var net = totalWin - BJ.bet - (BJ.splitBet || 0);
+  var msg = msgs.join(' · ');
+  if (net > 0) bjMsg(msg + ' ★', '#c9a84c');
+  else if (net === 0) bjMsg(msg, '#f39c12');
+  else bjMsg(msg, '#ff6b6b');
+
+  bjRender();
+  bjEndHand();
+
+  // Award credits to player profile
+  if (CURRENT_USER && net !== 0) {
+    CURRENT_USER.credits = (CURRENT_USER.credits || 100) + net;
+    localStorage.setItem('tteka_user', JSON.stringify(CURRENT_USER));
+    updateHomeProfile(CURRENT_USER);
+    showCreditPop(net, net > 0 ? 'Blackjack win' : 'Blackjack loss');
+  }
+}
+
+function bjEndHand() {
+  BJ.phase = 'done';
+  document.getElementById('bj-hit').disabled = true;
+  document.getElementById('bj-stand').disabled = true;
+  document.getElementById('bj-next-hand').style.display = '';
+
+  // Update last bet for convenience
+  BJ.lastBet = BJ.bet;
+}
+
+function initBlackjack() {
+  BJ.deck = bjMakeDeck(6);
+  BJ.credits = CURRENT_USER ? (CURRENT_USER.credits || 100) : 100;
+  BJ.bet = 0;
+  BJ.dealerHand = [];
+  BJ.playerHand = [];
+  BJ.splitHand = [];
+  BJ.phase = 'bet';
+  BJ.insuranceBet = 0;
+
+  // Show BJ screen
+  document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('on'); });
+  var bjScr = document.getElementById('s-blackjack');
+  if (bjScr) { bjScr.classList.add('on'); bjScr.style.display = 'flex'; }
+
+  bjShowBet();
+
+  // Wire buttons
+  document.getElementById('bj-menu').onclick = function() {
+    if (confirm('Leave Blackjack?')) {
+      bjScr.classList.remove('on'); bjScr.style.display = 'none';
+      document.querySelectorAll('.scr').forEach(function(s){ s.classList.remove('on'); });
+      var home = document.getElementById('s-name');
+      if (home) home.classList.add('on');
+    }
+  };
+
+  document.querySelectorAll('.bj-chip').forEach(function(chip) {
+    chip.onclick = function() {
+      var amt = parseInt(chip.dataset.bet);
+      if (BJ.credits >= BJ.bet + amt) {
+        BJ.bet += amt;
+        document.getElementById('bj-bet-display').textContent = BJ.bet;
+      } else {
+        bjMsg('Not enough credits!', '#ff6b6b');
+      }
+    };
+  });
+
+  document.getElementById('bj-clear-bet').onclick = function() {
+    BJ.bet = 0;
+    document.getElementById('bj-bet-display').textContent = 0;
+    bjMsg('');
+  };
+
+  document.getElementById('bj-deal-btn').onclick = bjStartHand;
+  document.getElementById('bj-hit').onclick = bjHit;
+  document.getElementById('bj-stand').onclick = bjStand;
+  document.getElementById('bj-double').onclick = bjDouble;
+  document.getElementById('bj-split').onclick = bjSplit;
+  document.getElementById('bj-insurance').onclick = bjInsurance;
+
+  document.getElementById('bj-next-hand').onclick = function() {
+    BJ.bet = BJ.lastBet > BJ.credits ? BJ.credits : BJ.lastBet;
+    BJ.splitHand = [];
+    BJ.playerHand = [];
+    BJ.dealerHand = [];
+    BJ.phase = 'bet';
+    bjShowBet();
+    bjMsg('');
+  };
+}
+/* ══ END BLACKJACK ══ */
 
 } // end initGame
 
