@@ -101,6 +101,7 @@ app.post('/api/signup', (req, res) => {
   };
   db.users.push(user);
   saveDB(db);
+  console.log('User signed up:', clean, '| Total users:', db.users.length);
   const { password: _, ...safe } = user;
   const level = getLevel(user.credits);
   res.json({ ok: true, user: { ...safe, level } });
@@ -112,6 +113,7 @@ app.post('/api/login', (req, res) => {
   if (!username || !password) return res.json({ ok: false, error: 'Username and password required' });
   const db = loadDB();
   const user = db.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+  console.log('Login attempt:', username, '| Found user:', !!user, '| Users in DB:', db.users.length);
   if (!user || user.password !== hashPassword(password)) return res.json({ ok: false, error: 'Wrong username or password' });
   // Refresh token on login
   user.token = generateToken();
