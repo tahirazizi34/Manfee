@@ -329,19 +329,48 @@ function askNextBid(code) {
   if (g.bidIdx >= 3) { askDealerDecision(code); return; }
   const seat = g.bidOrder[g.bidIdx];
   const player = room.seats[seat];
+  const isThirdBidder = g.bidIdx === 2;
+  const partnerSeat = isThirdBidder ? g.bidOrder[0] : -1; // Bidder 1 is opp partner
+  const partnerBid = isThirdBidder ? g.bids[partnerSeat] : 0;
+
   if (!player || player.id.startsWith('ai_')) {
     const hand = g.hands[seat];
     const so = g.bids.reduce((a, b) => a + (b >= 0 ? b : 0), 0);
     const spades = hand.filter(c => c.s === 'S').length;
     const high = hand.filter(c => RV[c.r] >= 12).length;
     const maxBid = Math.max(0, 13 - so - (3 - g.bidIdx));
-    const bid = Math.max(0, Math.min(maxBid, Math.floor(spades * 0.65 + high * 0.4 + Math.random() * 1.5)));
-    g.bids[seat] = bid; g.bidIdx++;
-    io.to(code).emit('bid_placed', { seat, bid });
+    let bid = Math.max(0, Math.min(maxBid, Math.floor(spades * 0.65 + high * 0.4 + Math.random() * 1.5)));
+
+    if (isThirdBidder) {
+      // AI: decide whether to subtract from partner or just bid
+      const subtractAmt = partnerBid > 2 && Math.random() < 0.3 ? Math.floor(Math.random() * Math.min(partnerBid, 3)) : 0;
+      if (subtractAmt > 0) {
+        g.bids[partnerSeat] -= subtractAmt;
+        io.to(code).emit('bid_placed', { seat: partnerSeat, bid: g.bids[partnerSeat], adjusted: true });
+      }
+      const soAfter = g.bids.reduce((a, b) => a + (b >= 0 ? b : 0), 0);
+      const maxAfter = Math.max(0, 13 - soAfter);
+      bid = Math.max(0, Math.min(maxAfter, bid));
+      g.bids[seat] = bid;
+      g.bidIdx++;
+      io.to(code).emit('bid_placed', { seat, bid });
+      io.to(code).emit('bid3_result', { partnerSeat, partnerBid: g.bids[partnerSeat], ownBid: bid, subtractAmt });
+    } else {
+      g.bids[seat] = bid; g.bidIdx++;
+      io.to(code).emit('bid_placed', { seat, bid });
+    }
     setTimeout(() => askNextBid(code), 600);
   } else {
-    io.to(player.id).emit('bid_request', { seat, bidsPlaced: g.bids });
-    io.to(code).emit('bid_request', { seat, bidsPlaced: g.bids });
+    if (isThirdBidder) {
+      // Send special bid3 request with partner info
+      io.to(player.id).emit('bid3_request', {
+        seat, partnerSeat, partnerBid, bidsPlaced: g.bids
+      });
+      io.to(code).emit('bid_request', { seat, bidsPlaced: g.bids });
+    } else {
+      io.to(player.id).emit('bid_request', { seat, bidsPlaced: g.bids });
+      io.to(code).emit('bid_request', { seat, bidsPlaced: g.bids });
+    }
   }
 }
 
@@ -692,6 +721,25 @@ io.on('connection', socket => {
     const seat=g.bidOrder[g.bidIdx];
     g.bids[seat]=bid; g.bidIdx++;
     io.to(code).emit('bid_placed',{seat,bid});
+    askNextBid(code);
+  });
+
+  socket.on('place_bid3', ({ code, subtractAmt, ownBid }) => {
+    const room=rooms[code]; if(!room)return;
+    const g=room.game;
+    if(g.bidIdx!==2)return;
+    const seat=g.bidOrder[2];
+    const partnerSeat=g.bidOrder[0];
+    const subtract=Math.max(0,Math.min(subtractAmt||0, g.bids[partnerSeat]));
+    if(subtract>0){
+      g.bids[partnerSeat]-=subtract;
+      io.to(code).emit('bid_placed',{seat:partnerSeat,bid:g.bids[partnerSeat],adjusted:true});
+    }
+    const so=g.bids.reduce((a,b)=>a+(b>=0?b:0),0);
+    const own=Math.max(0,Math.min(ownBid||0,13-so));
+    g.bids[seat]=own; g.bidIdx++;
+    io.to(code).emit('bid_placed',{seat,bid:own});
+    io.to(code).emit('bid3_result',{partnerSeat,partnerBid:g.bids[partnerSeat],ownBid:own,subtractAmt:subtract});
     askNextBid(code);
   });
 
