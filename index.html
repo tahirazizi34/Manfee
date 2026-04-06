@@ -324,7 +324,7 @@ html,body{height:100%;background:#060f09;}
 .bmarks{display:flex;justify-content:space-between;font-size:8px;color:var(--tm);margin-bottom:10px;}
 .binfo{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:10px;color:rgba(255,255,255,.6);text-align:left;line-height:1.8;}
 .binfo b{color:var(--gold);}
-.gcbtn{width:100%;background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:9px;color:#0a1a08;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.5px;box-shadow:0 3px 12px rgba(201,168,76,.3);transition:all .2s;}
+.gcbtn{width:100%;background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:9px;color:#0a1a08;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.5px;box-shadow:0 3px 12px rgba(201,168,76,.3);transition:all .2s;margin-top:6px;}
 .gcbtn:hover{background:var(--gold2);}
 .gcbtn.sec{background:transparent;border:1.5px solid rgba(201,168,76,.5);color:var(--gold);margin-top:7px;}
 .opt-btn{width:100%;border:none;border-radius:7px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;margin-top:6px;text-align:left;padding-left:12px;}
@@ -656,7 +656,39 @@ html,body{height:100%;background:#060f09;}
 
   <!-- Overlays -->
   <div class="gov" id="gov-announce"><div class="gmodal"><h2>Dealer Selected</h2><div class="gmsub" id="gan-sub"></div><div style="background:rgba(255,255,255,.05);border:1px solid var(--gold);border-radius:10px;padding:12px;margin-bottom:12px;"><div style="font-size:22px;font-weight:700;color:var(--gold);" id="gan-name">-</div><div style="font-size:11px;color:var(--tm);" id="gan-role"></div></div><div class="binfo" id="gan-order"></div><button class="gcbtn" id="btn-gan-ok">Start Bidding</button></div></div>
-  <div class="gov" id="gov-bid"><div class="gmodal"><h2>Your Bid</h2><div class="gmsub">Spades ♠ are always trump</div><div class="bnum" id="g-bnum">0</div><div class="bsub" id="g-btxt">tricks</div><input type="range" class="brng" id="g-brng" min="0" max="13" step="1" value="0"><div class="bmarks"><span>0</span><span>3</span><span>6</span><span>9</span><span>13</span></div><div class="binfo" id="g-binfo"></div><button class="gcbtn" id="btn-confirm-bid">Confirm Bid</button></div></div>
+  <div class="gov" id="gov-bid3">
+  <div class="gmodal">
+    <h2>Your Bid <span style="font-size:11px;color:rgba(255,255,255,.5);font-weight:400;">(3rd Bidder)</span></h2>
+    <p class="gmsub" id="bid3-sub">You can subtract from your partner's bid first</p>
+
+    <!-- Step 1: Subtract from partner -->
+    <div id="bid3-step1">
+      <div class="binfo" id="bid3-partner-info"></div>
+      <label style="font-size:10px;color:rgba(255,255,255,.5);display:block;margin-bottom:4px;">SUBTRACT FROM PARTNER'S BID</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <input type="range" class="brng" id="bid3-sub-rng" min="0" max="13" value="0" style="flex:1;">
+        <span id="bid3-sub-val" style="font-size:20px;font-weight:800;color:#fff;min-width:24px;text-align:center;">0</span>
+      </div>
+      <div class="bmarks"><span>0</span><span id="bid3-sub-max-lbl">partner bid</span></div>
+      <button class="gcbtn" id="bid3-next-btn">Next → Set My Bid</button>
+    </div>
+
+    <!-- Step 2: Own bid -->
+    <div id="bid3-step2" style="display:none;">
+      <div class="binfo" id="bid3-own-info"></div>
+      <label style="font-size:10px;color:rgba(255,255,255,.5);display:block;margin-bottom:4px;">YOUR BID</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <input type="range" class="brng" id="bid3-own-rng" min="0" max="13" value="0" style="flex:1;">
+        <span id="bid3-own-val" style="font-size:20px;font-weight:800;color:#fff;min-width:24px;text-align:center;">0</span>
+      </div>
+      <div class="bmarks"><span>0</span><span id="bid3-own-max-lbl">13</span></div>
+      <div class="binfo" id="bid3-team-total" style="margin-top:8px;text-align:center;font-size:12px;"></div>
+      <button class="gcbtn" id="bid3-confirm-btn">Confirm Bid</button>
+    </div>
+  </div>
+</div>
+
+<div class="gov" id="gov-bid"><div class="gmodal"><h2>Your Bid</h2><div class="gmsub">Spades ♠ are always trump</div><div class="bnum" id="g-bnum">0</div><div class="bsub" id="g-btxt">tricks</div><input type="range" class="brng" id="g-brng" min="0" max="13" step="1" value="0"><div class="bmarks"><span>0</span><span>3</span><span>6</span><span>9</span><span>13</span></div><div class="binfo" id="g-binfo"></div><button class="gcbtn" id="btn-confirm-bid">Confirm Bid</button></div></div>
   <div class="gov" id="gov-dealer"><div class="gmodal"><h2>Your Decision</h2><div class="gmsub" id="gdec-sub"></div><div class="binfo" id="gdec-info"></div><button class="opt-btn a" id="btn-accept">Accept — keep hand <span class="opt-tag">+1 pt</span></button><button class="opt-btn b" id="btn-sw1">Switch +1 — rotate hands <span class="opt-tag">+1 pt</span></button><button class="opt-btn c" id="btn-sw2">Switch +2 — rotate hands <span class="opt-tag">+2 pts</span></button></div></div>
   <div class="gov" id="gov-mem"><div class="gmodal"><h2>Cards Switched!</h2><div class="gmsub" id="gmem-sub"></div><div class="mem-cards" id="gmem-cards"></div><div class="mem-timer" id="gmem-timer">30</div><button class="gcbtn" id="btn-mem-ok">Ready — Start Play</button></div></div>
 </div>
@@ -1288,6 +1320,11 @@ function offNextBid(){
 
 function offShowMyBid(){
   offRenderHand();
+  // Check if I am the 3rd bidder (bidOrder[2] === 0)
+  if(OG.bidOrder[2]===0){
+    offShowBid3Modal();
+    return;
+  }
   var ov=offEl('gov-bid');if(!ov)return;
   ov.classList.add('on');
   var so=OG.bids.reduce(function(a,b){return a+(b>=0?b:0);},0);
@@ -1306,6 +1343,82 @@ function offShowMyBid(){
     offGlog('You bid <b>'+bid+'</b>');
     offSet('pb0',bid);
     OG.bidIdx++;offNextBid();
+  };
+}
+
+function offShowBid3Modal(){
+  var partnerSeat=OG.bidOrder[0];
+  var partnerBid=OG.bids[partnerSeat];
+  var so=OG.bids.reduce(function(a,b){return a+(b>=0?b:0);},0);
+  var names=[ME.name,AI_NAMES[0],AI_NAMES[1],AI_NAMES[2]];
+  var partnerName=names[partnerSeat]||'Partner';
+
+  var ov=offEl('gov-bid3');
+  if(!ov)return;
+  ov.classList.add('on');
+
+  // Set partner info
+  offEl('bid3-partner-info').innerHTML='<b>'+partnerName+'</b> bid <b>'+partnerBid+'</b> tricks — subtract up to all of it';
+
+  var subRng=offEl('bid3-sub-rng');
+  var subVal=offEl('bid3-sub-val');
+  var step1=offEl('bid3-step1');
+  var step2=offEl('bid3-step2');
+
+  // Reset to step 1
+  step1.style.display=''; step2.style.display='none';
+  subRng.min=0; subRng.max=partnerBid; subRng.value=0;
+  subVal.textContent='0';
+  offEl('bid3-sub-max-lbl').textContent='max '+partnerBid;
+
+  subRng.oninput=function(){subVal.textContent=subRng.value;};
+
+  offEl('bid3-next-btn').onclick=function(){
+    var subtract=parseInt(subRng.value)||0;
+    var newPartnerBid=partnerBid-subtract;
+    var soAfterSub=(so-partnerBid)+newPartnerBid;
+    var maxOwn=Math.max(0,13-soAfterSub);
+
+    step1.style.display='none'; step2.style.display='';
+
+    var ownRng=offEl('bid3-own-rng');
+    var ownVal=offEl('bid3-own-val');
+    ownRng.min=0; ownRng.max=maxOwn; ownRng.value=0;
+    ownVal.textContent='0';
+    offEl('bid3-own-max-lbl').textContent='max '+maxOwn;
+
+    var ownInfo=offEl('bid3-own-info');
+    if(subtract>0){
+      ownInfo.innerHTML='Partner reduced to <b>'+newPartnerBid+'</b> (−'+subtract+'). Now set your bid:';
+    } else {
+      ownInfo.innerHTML='No subtraction. Set your own bid:';
+    }
+
+    function updateTotal(){
+      var own=parseInt(ownRng.value)||0;
+      var tt=newPartnerBid+own;
+      offEl('bid3-team-total').innerHTML='Team target: <b>'+newPartnerBid+'</b> + <b>'+own+'</b> = <b style="color:var(--gold)">'+tt+'</b> tricks';
+    }
+    updateTotal();
+    ownRng.oninput=function(){ownVal.textContent=ownRng.value;updateTotal();};
+
+    offEl('bid3-confirm-btn').onclick=function(){
+      var ownBid=parseInt(ownRng.value)||0;
+      ov.classList.remove('on');
+      step1.style.display=''; step2.style.display='none';
+
+      // Apply subtract to partner bid
+      if(subtract>0){
+        OG.bids[partnerSeat]=newPartnerBid;
+        offGlog('<b>'+partnerName+'</b> bid adjusted to <b>'+newPartnerBid+'</b> (−'+subtract+')');
+        offSet('pb'+partnerSeat,newPartnerBid);
+      }
+      OG.bids[0]=ownBid;
+      offGlog('You bid <b>'+ownBid+'</b>'+(subtract>0?' (subtracted '+subtract+' from partner)':''));
+      offSet('pb0',ownBid);
+      OG.bidIdx++;
+      offNextBid();
+    };
   };
 }
 
@@ -2016,6 +2129,22 @@ socket.on('new_round',({dealer,round,scores,seatOrder})=>{
 
 socket.on('deal_hand',({hand,cardCounts})=>{G.hand=hand;G.otherHands=cardCounts;renderAllHands();});
 
+socket.on('bid3_request',({seat,partnerSeat,partnerBid,bidsPlaced})=>{
+  G.phase='bid';
+  bidsPlaced.forEach((b,i)=>{if(b>=0){G.bids[i]=b;showBidTag(absToRel(i),b);}});
+  if(seat===MY_SEAT){
+    showBid3Modal(partnerSeat,partnerBid,bidsPlaced);
+  }
+});
+
+socket.on('bid3_result',({partnerSeat,partnerBid,ownBid,subtractAmt})=>{
+  G.bids[partnerSeat]=partnerBid;
+  showBidTag(absToRel(partnerSeat),partnerBid);
+  if(subtractAmt>0){
+    glog(`Partner bid adjusted to <b>${partnerBid}</b> (−${subtractAmt})`);
+  }
+});
+
 socket.on('bid_request',({seat,bidsPlaced})=>{
   G.phase='bid';
   bidsPlaced.forEach((b,i)=>{if(b>=0){G.bids[i]=b;showBidTag(absToRel(i),b);}});
@@ -2085,6 +2214,75 @@ socket.on('round_result',({scores,detail,gameOver,winner})=>{
   document.getElementById('res-lobby').onclick=()=>{socket.emit('leave_room',{code:ROOM?.code});go('s-lobby');loadRooms();};
   go('s-result');
 });
+
+function showBid3Modal(partnerSeat, partnerBid, bidsPlaced){
+  let ov=document.getElementById('gov-bid3');
+  ov.classList.add('on');
+
+  // Setup
+  let so=bidsPlaced.reduce((a,b)=>a+(b>=0?b:0),0);
+  let subRng=document.getElementById('bid3-sub-rng');
+  let subVal=document.getElementById('bid3-sub-val');
+  let step1=document.getElementById('bid3-step1');
+  let step2=document.getElementById('bid3-step2');
+  let partnerInfo=document.getElementById('bid3-partner-info');
+  let ownInfo=document.getElementById('bid3-own-info');
+  let teamTotal=document.getElementById('bid3-team-total');
+
+  // Partner info
+  let partnerName=G.seatOrder[partnerSeat]?G.seatOrder[partnerSeat].name:'Partner';
+  partnerInfo.innerHTML=`<b>${partnerName}</b> bid <b>${partnerBid}</b> tricks — subtract up to all of it`;
+
+  // Sub range
+  subRng.min=0; subRng.max=partnerBid; subRng.value=0;
+  subVal.textContent='0';
+  document.getElementById('bid3-sub-max-lbl').textContent=`max ${partnerBid}`;
+
+  subRng.oninput=function(){
+    subVal.textContent=subRng.value;
+  };
+
+  // Step 1 → Step 2
+  document.getElementById('bid3-next-btn').onclick=function(){
+    let subtract=parseInt(subRng.value)||0;
+    let newPartnerBid=partnerBid-subtract;
+    let soAfterSub=(so-partnerBid)+newPartnerBid; // adjust so for remaining
+    let maxOwn=Math.max(0,13-soAfterSub);
+
+    step1.style.display='none';
+    step2.style.display='';
+
+    let ownRng=document.getElementById('bid3-own-rng');
+    let ownVal=document.getElementById('bid3-own-val');
+    ownRng.min=0; ownRng.max=maxOwn; ownRng.value=0;
+    ownVal.textContent='0';
+    document.getElementById('bid3-own-max-lbl').textContent=`max ${maxOwn}`;
+
+    if(subtract>0){
+      ownInfo.innerHTML=`Partner reduced to <b>${newPartnerBid}</b> (−${subtract}). Now set your bid:`;
+    } else {
+      ownInfo.innerHTML=`No subtraction. Set your own bid:`;
+    }
+
+    function updateTotal(){
+      let own=parseInt(ownRng.value)||0;
+      let teamTricks=newPartnerBid+own;
+      teamTotal.innerHTML=`Team target: <b>${newPartnerBid}</b> + <b>${own}</b> = <b style="color:var(--gold)">${teamTricks}</b> tricks`;
+    }
+    updateTotal();
+    ownRng.oninput=function(){ ownVal.textContent=ownRng.value; updateTotal(); };
+
+    document.getElementById('bid3-confirm-btn').onclick=function(){
+      let ownBid=parseInt(ownRng.value)||0;
+      ov.classList.remove('on');
+      // Reset steps for next time
+      step1.style.display=''; step2.style.display='none';
+      subRng.value=0; subVal.textContent='0';
+      socket.emit('place_bid3',{code:ROOM.code,subtractAmt:subtract,ownBid:ownBid});
+      glog(`You bid <b>${ownBid}</b>${subtract>0?` (subtracted ${subtract} from partner)`:''}`);
+    };
+  };
+}
 
 function showDealerAnnounce(){
   let ov=document.getElementById('gov-announce');ov.classList.add('on');
