@@ -372,7 +372,7 @@ html,body{height:100%;background:#060f09;}
       <button id="tab-signup" onclick="switchAuthTab('signup')" style="flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;background:none;color:rgba(255,255,255,.5);">Sign Up</button>
     </div>
     <input class="auth-inp" id="auth-username" placeholder="Username" maxlength="20" autocomplete="username">
-    <input class="auth-inp" id="auth-password" placeholder="Password (min 4 chars)" type="password" maxlength="40" autocomplete="current-password">
+    <input class="auth-inp" id="auth-password" placeholder="Password (min 8 chars)" type="password" maxlength="40" autocomplete="current-password">
     <div id="auth-err" style="color:#ff6b6b;font-size:11px;text-align:center;min-height:16px;"></div>
     <button id="auth-submit" onclick="submitAuth()" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:14px;color:#0a1a08;font-size:14px;font-weight:800;cursor:pointer;width:100%;">Login</button>
     <div style="font-size:10px;color:rgba(255,255,255,.3);text-align:center;">Progress and credits saved to your account</div>
@@ -1220,7 +1220,8 @@ function initOfflineGame(mode){
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
   var gs=offEl('s-game');if(gs)gs.classList.add('on');
 
-  offSet('g-mode-badge',mode.toUpperCase()+' (AI)');
+  var modeNames={manfee:'Afghani Manfee',kash:'Kash',teka:'Teka'};
+  offSet('g-mode-badge',(modeNames[mode]||mode.toUpperCase())+' (AI)');
   offEl('g-tri').style.display=OG.trump?'':'none';
   offEl('g-menu-btn').onclick=function(){if(confirm('Leave game?'))offGoHome();};
 
@@ -1582,7 +1583,7 @@ document.getElementById('btn-create').onclick=()=>{
   ov.innerHTML=`<div class="modal"><h3>Create a Room</h3>
     <div class="field"><label>ROOM NAME</label><input id="cr-name" placeholder="e.g. Friday Night Game" maxlength="24"></div>
     <div class="field"><label>GAME MODE</label><div class="tog-row">
-      <div class="tog sel" data-mode="manfee">Manfee</div>
+      <div class="tog sel" data-mode="manfee">Afghani Manfee</div>
       <div class="tog" data-mode="kash">Kash</div>
       <div class="tog" data-mode="teka">Teka</div>
     </div></div>
@@ -1643,7 +1644,7 @@ socket.on('rooms_list', rooms => {
   el.innerHTML=rooms.map(r=>{
     let full=r.playerCount>=4;
     let badge=full?'<span class="badge b-full">Full</span>':r.visibility==='private'?'<span class="badge b-prv">Private</span>':'<span class="badge b-pub">Public</span>';
-    return `<div class="room-card" data-code="${r.code}"><div><div class="rc-name">${r.name}${badge}</div><div class="rc-meta">Host: ${r.hostName} · ${r.mode.toUpperCase()}</div></div><div class="rc-count">${r.playerCount}/4</div></div>`;
+    return `<div class="room-card" data-code="${r.code}"><div><div class="rc-name">${r.name}${badge}</div><div class="rc-meta">Host: ${r.hostName} · ${r.mode==='manfee'?'Afghani Manfee':r.mode==='kash'?'Kash':'Teka'}</div></div><div class="rc-count">${r.playerCount}/4</div></div>`;
   }).join('');
   // Use event listeners instead of inline onclick
   el.querySelectorAll('.room-card').forEach(card=>{
@@ -1985,7 +1986,7 @@ function setupGameUI(){
   document.getElementById('pav1').textContent=inits(names[1]);
   document.getElementById('pnm3').textContent=names[3];
   document.getElementById('pav3').textContent=inits(names[3]);
-  document.getElementById('g-mode-badge').textContent=G.mode==='manfee'?'MANFEE':G.mode==='kash'?'KASH':'TEKA';
+  document.getElementById('g-mode-badge').textContent=G.mode==='manfee'?'AFGHANI MANFEE':G.mode==='kash'?'KASH':'TEKA';
   document.getElementById('g-tri').style.display=G.trump?'':'none';
   renderScore();
   document.getElementById('g-menu-btn').onclick=()=>{if(confirm('Leave game?')){socket.emit('leave_room',{code:ROOM?.code});go('s-lobby');loadRooms();}};
