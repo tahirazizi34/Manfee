@@ -794,7 +794,7 @@ window._logout=function(){
       fetch(SERVER_URL+'/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token})})
         .then(function(r){return r.json();}).then(function(data){
           if(data.ok){CURRENT_USER=data.user;localStorage.setItem('tteka_user',JSON.stringify(data.user));updateHomeProfile(data.user);}
-          else window._logout();
+          // Don't logout on auth failure - server may have restarted. User stays logged in from cache.
         }).catch(function(){});
     }catch(e){go('s-auth');}
   }else{go('s-auth');}
