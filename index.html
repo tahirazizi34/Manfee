@@ -262,9 +262,9 @@ html,body{height:100%;background:#060f09;}
 .hand{padding:10px 8px 12px;background:rgba(0,0,0,.5);border-top:1px solid rgba(255,255,255,.1);flex-shrink:0;}
 .hhint{color:rgba(255,255,255,.35);font-size:9px;letter-spacing:1px;text-align:center;margin-bottom:5px;}
 .hcards{display:flex;flex-wrap:nowrap;justify-content:center;min-height:90px;padding:0 4px 4px;overflow:visible;}
-.hc{width:48px;height:72px;background:#fff;border:none;border-radius:7px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;padding:3px;position:relative;flex-shrink:0;user-select:none;touch-action:none;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 8px rgba(0,0,0,.5);margin-right:-14px;}
+.hc{width:48px;height:72px;border:1.5px solid #c9a84c;border-radius:7px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;padding:3px;position:relative;flex-shrink:0;user-select:none;touch-action:none;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 8px rgba(0,0,0,.4);margin-right:-14px;background-color:#fff;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='white'/%3E%3Cpath d='M6 0L12 6L6 12L0 6Z' fill='none' stroke='%23c9a84c' stroke-width='0.5' opacity='0.35'/%3E%3Ccircle cx='6' cy='6' r='1.5' fill='%23c9a84c' opacity='0.2'/%3E%3C/svg%3E");}
 .hc:last-child{margin-right:0;}
-.hc:hover:not(.dis){transform:translateY(-18px);box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 8px rgba(201,168,76,.4);z-index:10;}
+.hc:hover:not(.dis){transform:translateY(-18px);box-shadow:0 8px 20px rgba(0,0,0,.6);z-index:10;}
 .hc.dis{opacity:.35;cursor:default;}
 .hc.drg{opacity:.2;transform:translateY(-16px);}
 .hc.bid-view{cursor:default;transform:none!important;}
@@ -272,15 +272,11 @@ html,body{height:100%;background:#060f09;}
 .hc .cr{font-size:13px;font-weight:700;line-height:1;}
 .hc .cs{font-size:10px;line-height:1;}
 .hc .cc{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16px;}
-.hc.hrt .cr,.hc.hrt .cs,.hc.hrt .cc{color:#cc2222;}
-.hc.dia .cr,.hc.dia .cs,.hc.dia .cc{color:#cc5500;}
+.hc.hrt .cr,.hc.hrt .cs,.hc.hrt .cc{color:#e03030;}
+.hc.dia .cr,.hc.dia .cs,.hc.dia .cc{color:#e06020;}
 .hc.spd .cr,.hc.spd .cs,.hc.spd .cc{color:#1a3a7a;}
 .hc.clb .cr,.hc.clb .cs,.hc.clb .cc{color:#1a6e2e;}
-.hc.spd{border-color:#3a5a9a;}
-.hc.hrt{border-color:#cc2222;}
-.hc.dia{border-color:#cc5500;}
-.hc.clb{border-color:#2a7a3a;}
-#ghost{position:fixed;width:48px;height:72px;background-color:#fff;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='white'/%3E%3Cpath d='M6 0L12 6L6 12L0 6Z' fill='none' stroke='%23c9a84c' stroke-width='0.5' opacity='0.35'/%3E%3Ccircle cx='6' cy='6' r='1.5' fill='%23c9a84c' opacity='0.2'/%3E%3C/svg%3E");background:#fff;border:2px solid var(--gold);border-radius:8px;pointer-events:none;display:none;flex-direction:column;align-items:flex-start;padding:4px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+#ghost{position:fixed;width:48px;height:72px;background:#fff;border:2px solid var(--gold);border-radius:8px;pointer-events:none;display:none;flex-direction:column;align-items:flex-start;padding:4px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.5);}
 #ghost .cr{font-size:13px;font-weight:700;}
 #ghost .cs{font-size:10px;}
 #ghost.hrt .cr,#ghost.hrt .cs{color:#e03030;}
@@ -349,53 +345,19 @@ html,body{height:100%;background:#060f09;}
 .rbtn{background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:12px;padding:12px 24px;color:#0a1a08;font-size:13px;font-weight:800;cursor:pointer;margin:4px;box-shadow:0 4px 16px rgba(201,168,76,.3);}
 .rbtn.sec{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);}
 
-/* ── AUTH SCREENS ── */
-#s-auth{background:radial-gradient(ellipse at 50% 40%,#0a2a4a,#051525,#020d18);}
-.auth-box{width:90%;max-width:340px;margin:auto;padding:32px 24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;display:flex;flex-direction:column;gap:14px;}
-.auth-title{font-size:26px;font-weight:900;color:#fff;text-align:center;letter-spacing:1px;}
-.auth-sub{font-size:12px;color:rgba(255,255,255,.4);text-align:center;margin-top:-8px;}
-.auth-tabs{display:flex;background:rgba(255,255,255,.06);border-radius:10px;padding:3px;gap:3px;}
-.auth-tab{flex:1;padding:8px;border:none;border-radius:8px;background:none;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
-.auth-tab.active{background:var(--gold);color:#0a1a08;}
-.auth-inp{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;outline:none;width:100%;box-sizing:border-box;}
-.auth-inp:focus{border-color:var(--gold);}
+/* ── AUTH ── */
+.auth-inp{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;outline:none;width:100%;box-sizing:border-box;}
+.auth-inp:focus{border-color:#c9a84c;}
 .auth-inp::placeholder{color:rgba(255,255,255,.3);}
-.auth-btn{background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:13px;color:#0a1a08;font-size:14px;font-weight:800;cursor:pointer;width:100%;}
-.auth-err{color:#ff6b6b;font-size:11px;text-align:center;min-height:16px;}
-.auth-hint{font-size:10px;color:rgba(255,255,255,.3);text-align:center;}
-
-/* ── PLAYER BADGE ── */
-.player-badge{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,.06);border-radius:10px;border:1px solid rgba(255,255,255,.1);}
-.badge-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
-.badge-info{display:flex;flex-direction:column;gap:1px;}
-.badge-name{font-size:13px;font-weight:700;color:#fff;}
-.badge-level{font-size:10px;font-weight:600;}
-.badge-credits{font-size:10px;color:rgba(255,255,255,.5);}
-
-/* ── CREDIT POPUP ── */
-.credit-pop{position:fixed;top:60px;right:16px;background:rgba(10,26,8,.95);border:1px solid var(--gold);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;color:var(--gold);z-index:999;pointer-events:none;opacity:0;transform:translateY(-10px);transition:all .3s;}
+.credit-pop{position:fixed;top:60px;right:16px;background:rgba(10,26,8,.95);border:1px solid #c9a84c;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;color:#c9a84c;z-index:999;pointer-events:none;opacity:0;transform:translateY(-10px);transition:all .3s;}
 .credit-pop.show{opacity:1;transform:translateY(0);}
-
-/* ── LEADERBOARD ── */
-.lb-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);}
-.lb-rank{font-size:16px;font-weight:900;width:24px;text-align:center;color:rgba(255,255,255,.4);}
-.lb-rank.gold{color:#c9a84c;}
-.lb-rank.silver{color:#aaa;}
-.lb-rank.bronze{color:#cd7f32;}
-.lb-name{flex:1;font-size:13px;font-weight:600;color:#fff;}
-.lb-cred{font-size:12px;font-weight:700;color:var(--gold);}
-.lb-lvl{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;}
-
-/* ── PROFILE IN HOME ── */
-.home-profile{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.05);border-radius:12px;border:1px solid rgba(255,255,255,.08);margin-bottom:16px;}
-.hp-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;}
+.home-profile{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.05);border-radius:12px;border:1px solid rgba(255,255,255,.08);margin:8px 0;}
+.hp-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;}
 .hp-info{flex:1;}
-.hp-name{font-size:15px;font-weight:700;color:#fff;}
-.hp-level{font-size:11px;font-weight:600;}
-.hp-credits{font-size:11px;color:rgba(255,255,255,.5);}
-.hp-logout{font-size:10px;color:rgba(255,255,255,.3);cursor:pointer;border:none;background:none;padding:4px 8px;border-radius:6px;}
-.hp-logout:hover{color:rgba(255,255,255,.6);}
-
+.hp-name{font-size:14px;font-weight:700;color:#fff;}
+.hp-level{font-size:10px;font-weight:600;}
+.hp-credits{font-size:10px;color:rgba(255,255,255,.5);}
+.hp-logout{font-size:10px;color:rgba(255,255,255,.35);cursor:pointer;border:1px solid rgba(255,255,255,.15);background:none;padding:4px 8px;border-radius:6px;}
 </style>
 </head>
 <body>
@@ -403,14 +365,14 @@ html,body{height:100%;background:#060f09;}
 
 <div id="s-auth" class="scr on" style="background:radial-gradient(ellipse at 50% 40%,#0a2a4a,#051525,#020d18);justify-content:center;align-items:center;">
   <div style="width:90%;max-width:340px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:32px 24px;display:flex;flex-direction:column;gap:14px;">
-    <div style="font-size:32px;font-weight:900;color:#fff;text-align:center;letter-spacing:1px;">T - Teka</div>
-    <div style="font-size:12px;color:rgba(255,255,255,.4);text-align:center;margin-top:-8px;">Afghan Card Game</div>
+    <div style="font-size:32px;font-weight:900;color:#fff;text-align:center;letter-spacing:1px;">T — Teka</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.4);text-align:center;">Afghan Card Game</div>
     <div style="display:flex;background:rgba(255,255,255,.07);border-radius:10px;padding:3px;gap:3px;">
-      <button id="tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:9px;border:none;border-radius:8px;background:var(--gold);color:#0a1a08;font-size:12px;font-weight:700;cursor:pointer;">Login</button>
-      <button id="tab-signup" onclick="switchAuthTab('signup')" style="flex:1;padding:9px;border:none;border-radius:8px;background:none;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;">Sign Up</button>
+      <button id="tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:800;background:linear-gradient(135deg,#c9a84c,#e8c96a);color:#0a1a08;">Login</button>
+      <button id="tab-signup" onclick="switchAuthTab('signup')" style="flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;background:none;color:rgba(255,255,255,.5);">Sign Up</button>
     </div>
-    <input class="auth-inp" id="auth-username" placeholder="Username" maxlength="20" autocomplete="username" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;outline:none;width:100%;box-sizing:border-box;">
-    <input class="auth-inp" id="auth-password" placeholder="Password (min 4 chars)" type="password" maxlength="40" autocomplete="current-password" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;outline:none;width:100%;box-sizing:border-box;">
+    <input class="auth-inp" id="auth-username" placeholder="Username" maxlength="20" autocomplete="username">
+    <input class="auth-inp" id="auth-password" placeholder="Password (min 4 chars)" type="password" maxlength="40" autocomplete="current-password">
     <div id="auth-err" style="color:#ff6b6b;font-size:11px;text-align:center;min-height:16px;"></div>
     <button id="auth-submit" onclick="submitAuth()" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:14px;color:#0a1a08;font-size:14px;font-weight:800;cursor:pointer;width:100%;">Login</button>
     <div style="font-size:10px;color:rgba(255,255,255,.3);text-align:center;">Progress and credits saved to your account</div>
@@ -424,7 +386,7 @@ html,body{height:100%;background:#060f09;}
     <div class="fsym fs4">♦</div><div class="fsym fs5">♠</div><div class="fsym fs6">♦</div>
   </div>
   <div class="home-content">
-    <div <div class="home-title">T - Teka</div>
+    <div class="home-title">T - Teka</div>
     <div class="home-divider">
       <span class="hd-line"></span>
       <span class="hd-diamond">◆</span>
@@ -434,14 +396,10 @@ html,body{height:100%;background:#060f09;}
     </div>
     <div id="home-profile-box" class="home-profile" style="display:none">
       <div class="hp-av" id="hp-av" style="background:#1a3a7a;">?</div>
-      <div class="hp-info">
-        <div class="hp-name" id="hp-name">-</div>
-        <div class="hp-level" id="hp-level">Newcomer</div>
-        <div class="hp-credits" id="hp-credits">100 credits</div>
-      </div>
+      <div class="hp-info"><div class="hp-name" id="hp-name">Player</div><div class="hp-level" id="hp-level" style="color:#aaaaff;">Newcomer</div><div class="hp-credits" id="hp-credits">100 credits</div></div>
       <button class="hp-logout" onclick="window._logout&&window._logout()">Logout</button>
     </div>
-    <input class="home-ni" id="name-in" placeholder="Enter your name to play" maxlength="16" autocomplete="off" style="display:none">
+    <input class="home-ni" id="name-in" placeholder="Enter your name to play" maxlength="16" autocomplete="off">
     <div class="home-btns">
       <button class="home-main-btn online-btn" id="hbtn-online">
         <div class="hmb-icon">⊞</div>
@@ -468,8 +426,7 @@ html,body{height:100%;background:#060f09;}
   var ni = document.getElementById('name-in');
 
   function updateHomeButtons() {
-    var savedName = sessionStorage.getItem('tteka_name');
-    var ok = (ni && ni.value.trim().length >= 2) || (savedName && savedName.length >= 2);
+    var ok = ni && ni.value.trim().length >= 2;
     var ob = document.getElementById('hbtn-online');
     var ab = document.getElementById('hbtn-offline');
     if (ob) ob.classList.toggle('active', ok);
@@ -508,8 +465,8 @@ html,body{height:100%;background:#060f09;}
   // Play Online button
   var onlineBtn = document.getElementById('hbtn-online');
   if (onlineBtn) onlineBtn.addEventListener('click', function() {
-    var name = (ni&&ni.value.trim().length>=2)?ni.value.trim():(sessionStorage.getItem('tteka_name')||'');
-    if (name.length < 2) { if(ni&&ni.style.display!=='none') ni.focus(); return; }
+    var name = ni ? ni.value.trim() : '';
+    if (name.length < 2) { if(ni) ni.focus(); return; }
     window._pendingName = name;
     window._pendingAction = 'online';
     callWhenReady(window._doEnterLobby, [name]);
@@ -518,19 +475,12 @@ html,body{height:100%;background:#060f09;}
   // Play vs AI button
   var offlineBtn = document.getElementById('hbtn-offline');
   if (offlineBtn) offlineBtn.addEventListener('click', function() {
-    var name = (ni&&ni.value.trim().length>=2)?ni.value.trim():(sessionStorage.getItem('tteka_name')||'');
-    if (name.length < 2) { return; }
+    var name = ni ? ni.value.trim() : '';
+    if (name.length < 2) { if(ni) ni.focus(); return; }
     window._pendingName = name;
     window._pendingAction = 'offline';
     callWhenReady(window._doStartOffline, [name]);
   });
-
-  // Auto-restore name from previous session
-  var saved = sessionStorage.getItem('tteka_name');
-  if(saved && saved.length >= 2 && ni){
-    ni.value = saved;
-    updateHomeButtons();
-  }
 })();
 </script>
 
@@ -589,7 +539,9 @@ html,body{height:100%;background:#060f09;}
       <div style="display:flex;gap:6px;align-items:center;">
         <button class="mic-btn off" id="mic-btn" title="Click to join voice chat">🎤</button>
         <span id="voice-peers" style="font-size:10px;color:rgba(255,255,255,.5);"></span>
-        <button class="leave-btn" id="btn-leave">Leave</button>
+        <button class="mic-btn off" id="mic-btn" title="Voice chat">🎤</button>
+    <span id="voice-peers" style="font-size:10px;color:rgba(255,255,255,.4);flex:1;"></span>
+    <button class="leave-btn" id="btn-leave">Leave</button>
         <button class="start-btn" id="btn-start-game" style="display:none" onclick="window._startGame?window._startGame():alert('Game not ready')">Start Game</button>
       </div>
     </div>
@@ -612,7 +564,7 @@ html,body{height:100%;background:#060f09;}
       <div class="g-sneed" id="gbd0">—</div>
     </div>
     <div class="g-center-info">
-      <div class="g-mode" id="g-mode-badge">T-TEKA</div>
+      <div class="g-mode" id="g-mode-badge">MANFEE</div>
       <div class="g-round-info">Rd <span id="g-round">1</span> · D:<span id="g-dealer" style="color:var(--gold)">?</span></div>
     </div>
     <div class="g-scoreblock right">
@@ -690,7 +642,6 @@ html,body{height:100%;background:#060f09;}
   <!-- Message bar -->
   <div class="abar">
     <div class="amsg" id="g-msg">-</div>
-    <div id="my-credits-bar" style="font-size:10px;color:var(--gold);font-weight:700;flex-shrink:0;"></div>
     <button class="mic-btn off" id="g-mic-btn" title="Click to join voice chat" style="width:28px;height:28px;font-size:13px;flex-shrink:0;">🎤</button>
     <button class="abtn" id="g-menu-btn">⎋</button>
   </div>
@@ -744,146 +695,114 @@ html,body{height:100%;background:#060f09;}
 })();
 </script>
 <script>
-/* ══════════════════════════════════════════════
-   AUTH + CREDITS SYSTEM
-══════════════════════════════════════════════ */
-var CURRENT_USER = null;
-var SERVER_URL = (window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')
-  ? 'http://localhost:3000' : window.location.origin;
 
-// Level color helper
-function levelColor(credits){
-  if(credits>=2000)return'#ff4444';if(credits>=1500)return'#ff6600';
-  if(credits>=1100)return'#ffaa00';if(credits>=800)return'#aacc00';
-  if(credits>=550)return'#44cc44';if(credits>=350)return'#00ccaa';
-  if(credits>=200)return'#00aaff';if(credits>=130)return'#6688ff';
-  if(credits>=100)return'#aaaaff';return'#888888';
-}
-function levelTitle(credits){
-  if(credits>=2000)return'Grand Master';if(credits>=1500)return'Master';
-  if(credits>=1100)return'Expert';if(credits>=800)return'Advanced';
-  if(credits>=550)return'Skilled';if(credits>=350)return'Experienced';
-  if(credits>=200)return'Intermediate';if(credits>=130)return'Learner';
-  if(credits>=100)return'Beginner';return'Newcomer';
-}
-function getLevelNum(credits){
-  var thresholds=[2000,1500,1100,800,550,350,200,130,100,0];
-  for(var i=0;i<thresholds.length;i++) if(credits>=thresholds[i]) return 10-i;
-  return 1;
-}
+/* ══ AUTH + CREDITS ══ */
+var CURRENT_USER=null;
+var SERVER_URL=(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')
+  ?'http://localhost:3000':window.location.origin;
 
+function levelColor(cr){
+  if(cr>=2000)return'#ff4444';if(cr>=1500)return'#ff6600';if(cr>=1100)return'#ffaa00';
+  if(cr>=800)return'#aacc00';if(cr>=550)return'#44cc44';if(cr>=350)return'#00ccaa';
+  if(cr>=200)return'#00aaff';if(cr>=130)return'#6688ff';if(cr>=100)return'#aaaaff';
+  return'#888888';
+}
+function levelTitle(cr){
+  if(cr>=2000)return'Grand Master';if(cr>=1500)return'Master';if(cr>=1100)return'Expert';
+  if(cr>=800)return'Advanced';if(cr>=550)return'Skilled';if(cr>=350)return'Experienced';
+  if(cr>=200)return'Intermediate';if(cr>=130)return'Learner';if(cr>=100)return'Beginner';
+  return'Newcomer';
+}
+function levelNum(cr){
+  var t=[2000,1500,1100,800,550,350,200,130,100,0];
+  for(var i=0;i<t.length;i++)if(cr>=t[i])return 10-i;return 1;
+}
 function updateHomeProfile(user){
   var box=document.getElementById('home-profile-box');
   var ni=document.getElementById('name-in');
-  if(!box)return;
-  if(!user){box.style.display='none';if(ni)ni.style.display='';return;}
-  box.style.display='flex';
+  var hbts=document.querySelectorAll('.home-main-btn');
+  if(!user){
+    if(box)box.style.display='none';
+    if(ni)ni.style.display='';
+    hbts.forEach(function(b){b.classList.remove('active');b.style.pointerEvents='none';b.style.opacity='0.5';});
+    return;
+  }
+  if(box)box.style.display='flex';
   if(ni)ni.style.display='none';
+  var cr=user.credits||100;var col=levelColor(cr);
   var av=document.getElementById('hp-av');
   var nm=document.getElementById('hp-name');
   var lv=document.getElementById('hp-level');
-  var cr=document.getElementById('hp-credits');
-  var col=levelColor(user.credits||100);
+  var crel=document.getElementById('hp-credits');
   if(av){av.textContent=(user.username||'?').slice(0,2).toUpperCase();av.style.background=col;}
   if(nm)nm.textContent=user.username||'';
-  if(lv){lv.textContent='Lv.'+getLevelNum(user.credits||100)+' — '+levelTitle(user.credits||100);lv.style.color=col;}
-  if(cr)cr.textContent=(user.credits||100)+' credits';
+  if(lv){lv.textContent='Lv.'+levelNum(cr)+' \u2014 '+levelTitle(cr);lv.style.color=col;}
+  if(crel)crel.textContent=cr+' credits';
+  hbts.forEach(function(b){b.classList.add('active');b.style.pointerEvents='';b.style.opacity='1';});
+  var ni2=document.getElementById('name-in');
+  if(ni2)ni2.value=user.username||'';
+  sessionStorage.setItem('tteka_name',user.username||'');
 }
-
-function showCreditPop(amount, reason){
-  var el=document.getElementById('credit-pop');
-  if(!el)return;
-  var sign=amount>=0?'+':'';
-  el.textContent=sign+amount+' credits — '+reason;
+function showCreditPop(amount,reason){
+  var el=document.getElementById('credit-pop');if(!el)return;
+  el.textContent=(amount>=0?'+':'')+amount+' credits \u2014 '+reason;
   el.style.color=amount>=0?'#c9a84c':'#ff6b6b';
   el.style.borderColor=amount>=0?'#c9a84c':'#ff6b6b';
-  el.classList.add('show');
-  setTimeout(function(){el.classList.remove('show');},3000);
+  el.classList.add('show');clearTimeout(el._t);
+  el._t=setTimeout(function(){el.classList.remove('show');},3000);
 }
-
+function switchAuthTab(tab){
+  var lt=document.getElementById('tab-login');
+  var st=document.getElementById('tab-signup');
+  var btn=document.getElementById('auth-submit');
+  var on='flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:800;background:linear-gradient(135deg,#c9a84c,#e8c96a);color:#0a1a08;';
+  var off='flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;background:none;color:rgba(255,255,255,.5);';
+  if(tab==='login'){lt.style.cssText=on;st.style.cssText=off;btn.textContent='Login';}
+  else{st.style.cssText=on;lt.style.cssText=off;btn.textContent='Create Account';}
+  document.getElementById('auth-err').textContent='';
+}
 async function submitAuth(){
-  var mode=document.getElementById('tab-login').classList.contains('active')?'login':'signup';
+  var btn=document.getElementById('auth-submit');
+  var mode=btn.textContent==='Login'?'login':'signup';
   var username=document.getElementById('auth-username').value.trim();
   var password=document.getElementById('auth-password').value;
   var errEl=document.getElementById('auth-err');
-  var btn=document.getElementById('auth-submit');
   if(!username||!password){errEl.textContent='Please fill in all fields';return;}
-  btn.textContent='Please wait...';btn.disabled=true;
+  btn.textContent='Please wait...';btn.disabled=true;errEl.textContent='';
   try{
-    var res=await fetch(SERVER_URL+'/api/'+mode,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({username,password})
-    });
+    var res=await fetch(SERVER_URL+'/api/'+mode,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:username,password:password})});
     var data=await res.json();
     if(!data.ok){errEl.textContent=data.error||'Something went wrong';btn.disabled=false;btn.textContent=mode==='login'?'Login':'Create Account';return;}
-    // Success
     CURRENT_USER=data.user;
     localStorage.setItem('tteka_token',data.user.token);
     localStorage.setItem('tteka_user',JSON.stringify(data.user));
-    sessionStorage.setItem('tteka_name',data.user.username);
     updateHomeProfile(data.user);
-    // Pre-fill name for game
-    var ni=document.getElementById('name-in');
-    if(ni)ni.value=data.user.username;
     go('s-name');
-    // Trigger button state update
-    if(typeof updateHomeButtons==='function')updateHomeButtons();
-  }catch(e){errEl.textContent='Connection error. Is the server running?';btn.disabled=false;btn.textContent=mode==='login'?'Login':'Create Account';}
+  }catch(e){errEl.textContent='Connection error. Check server.';btn.disabled=false;btn.textContent=mode==='login'?'Login':'Create Account';}
 }
-
-function switchAuthTab(tab){
-  var loginTab=document.getElementById('tab-login');
-  var signupTab=document.getElementById('tab-signup');
-  var btn=document.getElementById('auth-submit');
-  if(tab==='login'){loginTab.classList.add('active');signupTab.classList.remove('active');btn.textContent='Login';}
-  else{signupTab.classList.add('active');loginTab.classList.remove('active');btn.textContent='Create Account';}
-  document.getElementById('auth-err').textContent='';
-}
-
 window._logout=function(){
-  CURRENT_USER=null;
-  localStorage.removeItem('tteka_token');
-  localStorage.removeItem('tteka_user');
-  sessionStorage.removeItem('tteka_name');
+  CURRENT_USER=null;localStorage.removeItem('tteka_token');localStorage.removeItem('tteka_user');sessionStorage.removeItem('tteka_name');
   updateHomeProfile(null);
-  document.getElementById('auth-username').value='';
-  document.getElementById('auth-password').value='';
-  document.getElementById('auth-err').textContent='';
-  go('s-auth');
+  document.getElementById('auth-username').value='';document.getElementById('auth-password').value='';
+  document.getElementById('auth-err').textContent='';switchAuthTab('login');go('s-auth');
 };
-
-// Auto-login on page load
 (function autoLogin(){
-  var token=localStorage.getItem('tteka_token');
-  var cached=localStorage.getItem('tteka_user');
+  var token=localStorage.getItem('tteka_token');var cached=localStorage.getItem('tteka_user');
   if(token&&cached){
     try{
-      var user=JSON.parse(cached);
-      CURRENT_USER=user;
-      updateHomeProfile(user);
-      var ni=document.getElementById('name-in');
-      if(ni)ni.value=user.username;
-      sessionStorage.setItem('tteka_name',user.username);
-      if(typeof updateHomeButtons==='function')updateHomeButtons();
-      // Verify token in background
-      fetch(SERVER_URL+'/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})})
-        .then(function(r){return r.json();})
-        .then(function(data){
+      var user=JSON.parse(cached);CURRENT_USER=user;updateHomeProfile(user);go('s-name');
+      fetch(SERVER_URL+'/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token})})
+        .then(function(r){return r.json();}).then(function(data){
           if(data.ok){CURRENT_USER=data.user;localStorage.setItem('tteka_user',JSON.stringify(data.user));updateHomeProfile(data.user);}
-          else{window._logout();}
+          else window._logout();
         }).catch(function(){});
-      // Don't redirect - stay on home screen if we have cached user
     }catch(e){go('s-auth');}
-  } else {
-    go('s-auth');
-  }
+  }else{go('s-auth');}
 })();
-
-// Allow Enter key on auth inputs
 document.getElementById('auth-username').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('auth-password').focus();});
 document.getElementById('auth-password').addEventListener('keydown',function(e){if(e.key==='Enter')submitAuth();});
+/* ══ END AUTH ══ */
 
-// ── END AUTH ──────────────────────────────────────────────────────────
 
 /* ── GLOBAL STATE - declared first so all functions can use them ── */
 var ME = {name:'', id:''};
@@ -914,10 +833,8 @@ function toast(msg){
 }
 
 window._doEnterLobby = function(name) {
-  var actualName = (CURRENT_USER && CURRENT_USER.username) ? CURRENT_USER.username : name;
-  sessionStorage.setItem('tteka_name', actualName);
+  var actualName=(CURRENT_USER&&CURRENT_USER.username)?CURRENT_USER.username:name;
   ME.name = actualName;
-  if(CURRENT_USER){ ME.userId=CURRENT_USER.id; ME.credits=CURRENT_USER.credits; ME.level=CURRENT_USER.level; }
   var lav = document.getElementById('lob-av');
   var lnm = document.getElementById('lob-name');
   if(lav) lav.textContent = inits(name);
@@ -945,7 +862,6 @@ window._doStartOffline = function(name) {
   ME.name = name;
   ME.id = 'offline_' + Math.random().toString(36).slice(2);
   window._offlineName = name;
-  sessionStorage.setItem('tteka_name', name);
   showOfflinePicker();
 };
 
@@ -960,7 +876,7 @@ function showOfflinePicker() {
     <h3 style="text-align:center;margin-bottom:8px;color:#fff;">Play vs AI</h3>
     <p style="color:rgba(255,255,255,.4);font-size:11px;text-align:center;margin-bottom:16px;">Choose a game mode</p>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button class="gbtn off-mode-btn" data-mode="manfee" style="background:linear-gradient(135deg,#1a3a6e,#0d2045);color:#fff;border:1.5px solid rgba(100,160,255,.4);line-height:1.8;">♠ T - Teka<br><small style="font-weight:400;opacity:.6">Spades trump · Bid &amp; switch</small></button>
+      <button class="gbtn off-mode-btn" data-mode="manfee" style="background:linear-gradient(135deg,#1a3a6e,#0d2045);color:#fff;border:1.5px solid rgba(100,160,255,.4);line-height:1.8;">♠ Afghani Manfee<br><small style="font-weight:400;opacity:.6">Spades trump · Bid &amp; switch</small></button>
       <button class="gbtn off-mode-btn" data-mode="kash" style="background:linear-gradient(135deg,#2d1f6e,#1a1045);color:#fff;border:1.5px solid rgba(180,100,255,.4);line-height:1.8;">♥ Kash<br><small style="font-weight:400;opacity:.6">No trump · Highest card wins</small></button>
       <button class="gbtn off-mode-btn" data-mode="teka" style="background:linear-gradient(135deg,#1f3a1a,#0d2010);color:#fff;border:1.5px solid rgba(100,200,100,.4);line-height:1.8;">♦ Teka<br><small style="font-weight:400;opacity:.6">Fixed 7 vs 6 bid split</small></button>
     </div>
@@ -1666,7 +1582,7 @@ document.getElementById('btn-create').onclick=()=>{
   ov.innerHTML=`<div class="modal"><h3>Create a Room</h3>
     <div class="field"><label>ROOM NAME</label><input id="cr-name" placeholder="e.g. Friday Night Game" maxlength="24"></div>
     <div class="field"><label>GAME MODE</label><div class="tog-row">
-      <div class="tog sel" data-mode="manfee">T-Teka</div>
+      <div class="tog sel" data-mode="manfee">Manfee</div>
       <div class="tog" data-mode="kash">Kash</div>
       <div class="tog" data-mode="teka">Teka</div>
     </div></div>
@@ -1684,7 +1600,7 @@ document.getElementById('btn-create').onclick=()=>{
   document.getElementById('cr-cancel').onclick=()=>ov.classList.remove('on');
   document.getElementById('cr-ok').onclick=()=>{
     let rname=document.getElementById('cr-name').value.trim()||`${ME.name}'s Room`;
-    socket.emit('create_room',{name:rname,mode:crMode,visibility:crVis,hostName:ME.name,userId:ME.userId||null,credits:ME.credits||100,level:ME.level||null});
+    socket.emit('create_room',{name:rname,mode:crMode,visibility:crVis,hostName:ME.name,userId:CURRENT_USER?CURRENT_USER.id:null,credits:CURRENT_USER?CURRENT_USER.credits:100,level:CURRENT_USER?CURRENT_USER.level:null});
     IS_HOST=true;MY_SEAT=0;ov.classList.remove('on');
   };
 };
@@ -1692,7 +1608,7 @@ document.getElementById('btn-create').onclick=()=>{
 function joinRoom(code){
   console.log('joinRoom called:', code, 'ME.name:', ME.name, 'socket.connected:', socket.connected);
   if(window._li){clearInterval(window._li);window._li=null;}
-  socket.emit('join_room',{code:code.toUpperCase().trim(),playerName:ME.name,userId:ME.userId||null,credits:ME.credits||100,level:ME.level||null});
+  socket.emit('join_room',{code:code.toUpperCase().trim(),playerName:ME.name,userId:CURRENT_USER?CURRENT_USER.id:null,credits:CURRENT_USER?CURRENT_USER.credits:100,level:CURRENT_USER?CURRENT_USER.level:null});
 }
 
 socket.on('room_created',({code})=>toast(`Room created! Code: ${code}`));
@@ -1706,8 +1622,7 @@ socket.on('player_left',({name})=>rlog(`${name} left.`));
 socket.on('credits_update',({credits,level,change,reason})=>{
   if(CURRENT_USER){CURRENT_USER.credits=credits;CURRENT_USER.level=level;localStorage.setItem('tteka_user',JSON.stringify(CURRENT_USER));updateHomeProfile(CURRENT_USER);}
   showCreditPop(change,reason);
-  // Update scorebar credits display
-  let cb=document.getElementById('my-credits-bar');
+  var cb=document.getElementById('my-credits-bar');
   if(cb)cb.textContent=credits+' cr';
 });
 
@@ -1742,7 +1657,7 @@ socket.on('rooms_list', rooms => {
 
 function openRoom(){
   document.getElementById('rm-title').textContent=ROOM.name;
-  document.getElementById('rm-mode').textContent=ROOM.mode==='manfee'?'T - Teka ♠':ROOM.mode==='kash'?'Kash ♥':'Teka ♦';
+  document.getElementById('rm-mode').textContent=ROOM.mode==='manfee'?'Afghani Manfee ♠':ROOM.mode==='kash'?'Kash ♥':'Teka ♦';
   document.getElementById('rm-code').textContent=ROOM.code;
   document.getElementById('rm-code').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(ROOM.code);toast('Code copied: '+ROOM.code);};
   go('s-room');renderRoom();
@@ -1765,7 +1680,6 @@ function renderSeat(i){
     el.className='seat'+(isMe?' mine':'');
     savEl.className='seat-av '+tc;savEl.textContent=inits(seat.name);
     snmEl.textContent=seat.name+(isMe?' (You)':'');
-    if(seat.level){snmEl.title='Lv.'+seat.level.level+' '+seat.level.title+' • '+( seat.credits||100)+' credits';}
     if(isMe){sbtEl.innerHTML='<button class="s-btn" onclick="leaveSeat()">Leave</button>';}
     else if(IS_HOST){sbtEl.innerHTML=`<button class="s-btn kick" onclick="kickSeat(${i})" title="Move to spectator">→ Spec</button>`;}
     else sbtEl.innerHTML='';
@@ -1815,7 +1729,7 @@ function takeSeat(i){
   if(!ROOM||!ROOM.code){toast('Not in a room');return;}
   if(ROOM.seats[i]&&ROOM.seats[i].id===socket.id)return;
   if(ROOM.seats[i]){toast('Seat taken');return;}
-  socket.emit('take_seat',{code:ROOM.code,seat:i,userId:ME.userId||null,credits:ME.credits||100,level:ME.level||null});
+  socket.emit('take_seat',{code:ROOM.code,seat:i,userId:CURRENT_USER?CURRENT_USER.id:null,credits:CURRENT_USER?CURRENT_USER.credits:100,level:CURRENT_USER?CURRENT_USER.level:null});
 }
 function leaveSeat(){if(!ROOM)return;socket.emit('leave_seat',{code:ROOM.code});MY_SEAT=-1;}
 function kickSeat(i){if(!ROOM)return;socket.emit('kick_seat',{code:ROOM.code,seat:i});}
@@ -2055,9 +1969,6 @@ socket.on('voice_peer_left',({peerId})=>{
 /* posSlots moved outside initGame */
 
 socket.on('game_start',({room,seatOrder})=>{
-  // Show credits in abar
-  let cb=document.getElementById('my-credits-bar');
-  if(cb&&CURRENT_USER) cb.textContent=(CURRENT_USER.credits||100)+' cr';
   ROOM=room;MY_SEAT=seatOrder.findIndex(s=>s.id===socket.id);
   G={mode:room.mode,scores:[0,0],round:1,dealer:-1,seatOrder,hand:[],bids:[-1,-1,-1,-1],teamTarget:[-1,-1],roundPts:1,dealerDecision:'accept',tr:[0,0,0,0],tk:[null,null,null,null],led:null,turn:-1,phase:'waiting',tc:0,switched:false,firstPlayer:-1,trump:room.mode==='kash'?null:'S',otherHands:[0,0,0,0]};
   go('s-game');setupGameUI();
@@ -2074,7 +1985,7 @@ function setupGameUI(){
   document.getElementById('pav1').textContent=inits(names[1]);
   document.getElementById('pnm3').textContent=names[3];
   document.getElementById('pav3').textContent=inits(names[3]);
-  document.getElementById('g-mode-badge').textContent=G.mode==='manfee'?'T-TEKA':G.mode==='kash'?'KASH':'TEKA';
+  document.getElementById('g-mode-badge').textContent=G.mode==='manfee'?'MANFEE':G.mode==='kash'?'KASH':'TEKA';
   document.getElementById('g-tri').style.display=G.trump?'':'none';
   renderScore();
   document.getElementById('g-menu-btn').onclick=()=>{if(confirm('Leave game?')){socket.emit('leave_room',{code:ROOM?.code});go('s-lobby');loadRooms();}};
@@ -2328,6 +2239,7 @@ window._startGame = function(){
 };
 
 } // end initGame
+
 </script>
 <script>
 if('serviceWorker' in navigator){
