@@ -82,7 +82,7 @@ app.post('/api/signup', (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.json({ ok: false, error: 'Username and password required' });
   if (username.length < 2 || username.length > 20) return res.json({ ok: false, error: 'Username must be 2-20 characters' });
-  if (password.length < 4) return res.json({ ok: false, error: 'Password must be at least 4 characters' });
+  if (password.length < 8) return res.json({ ok: false, error: 'Password must be at least 8 characters' });
   const clean = username.trim().replace(/[^a-zA-Z0-9_\- ]/g, '');
   if (clean.length < 2) return res.json({ ok: false, error: 'Invalid username characters' });
 
@@ -185,6 +185,9 @@ app.get('/', (req, res) => {
 
 // ── HELPERS ───────────────────────────────────────────────────────────
 const rooms = {};
+
+// Pre-load DB on startup
+loadDB();
 
 function uid() { return Math.random().toString(36).slice(2, 8).toUpperCase(); }
 
