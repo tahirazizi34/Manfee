@@ -822,6 +822,7 @@ html,body{height:100%;background:#060f09;}
 </script>
 <script>
 
+
 /* ══ AUTH + CREDITS ══ */
 var CURRENT_USER=null;
 var SERVER_URL=(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')
@@ -2548,6 +2549,15 @@ window._startGame = function(){
 };
 
 
+
+// Blackjack defined outside initGame
+
+
+} // end initGame
+
+
+</script>
+<script>
 /* ══════════════════════════════════════════════
    BLACKJACK ENGINE — Player vs Dealer (AI)
    Rules:
@@ -2738,7 +2748,7 @@ function bjDeal(){
   BJ.credits-=BJ.currentBet;
   BJ.hands=[[bjPop(),bjPop()]];
   BJ.bets=[BJ.currentBet];
-  BJ.dealer=[bjPop(),{...bjPop(),hidden:true}];
+  var holeCard=bjPop();holeCard.hidden=true;BJ.dealer=[bjPop(),holeCard];
   BJ.activeIdx=0;
   BJ.insurance=0;
   BJ.phase='play';
@@ -3018,10 +3028,9 @@ function initBlackjack(){
   };
 }
 /* ══ END BLACKJACK ══ */
-
-} // end initGame
-
+window.initBlackjack=initBlackjack;
 </script>
+
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
