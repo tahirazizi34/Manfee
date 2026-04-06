@@ -15,18 +15,30 @@ const io = new Server(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] }
 });
 
-// ── SIMPLE FILE DATABASE ──────────────────────────────────────────────
-const DB_PATH = path.join(__dirname, 'data', 'users.json');
+// ── DATABASE (in-memory + file backup) ───────────────────────────────
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'users.json');
+
+// In-memory store - survives within process, file backup for restarts
+let _memDB = null;
 
 function loadDB() {
+  if (_memDB) return _memDB; // Use memory if available
   try {
-    if (!fs.existsSync(path.dirname(DB_PATH))) fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-    if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify({ users: [] }));
-    return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-  } catch(e) { return { users: [] }; }
+    const dir = path.dirname(DB_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    if (fs.existsSync(DB_PATH)) {
+      _memDB = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    } else {
+      _memDB = { users: [] };
+    }
+  } catch(e) {
+    _memDB = { users: [] };
+  }
+  return _memDB;
 }
 
 function saveDB(db) {
+  _memDB = db; // Always update memory
   try { fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2)); } catch(e) {}
 }
 
