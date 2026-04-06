@@ -46,8 +46,20 @@ function hashPassword(password) {
   return crypto.createHash('sha256').update(password + 'tteka_salt_2024').digest('hex');
 }
 
-function generateToken() {
-  return crypto.randomBytes(32).toString('hex');
+// Token encodes username+passwordHash so auth works even after server restart
+function generateToken(username, passwordHash) {
+  const payload = Buffer.from(JSON.stringify({ u: username, h: passwordHash, t: Date.now() })).toString('base64');
+  const sig = crypto.createHash('sha256').update(payload + 'tteka_token_secret_2024').digest('hex').slice(0, 16);
+  return payload + '.' + sig;
+}
+
+function verifyToken(token) {
+  try {
+    const [payload, sig] = token.split('.');
+    const expectedSig = crypto.createHash('sha256').update(payload + 'tteka_token_secret_2024').digest('hex').slice(0, 16);
+    if (sig !== expectedSig) return null;
+    return JSON.parse(Buffer.from(payload, 'base64').toString());
+  } catch(e) { return null; }
 }
 
 // ── CREDIT SYSTEM ────────────────────────────────────────────────────
@@ -97,7 +109,7 @@ app.post('/api/signup', (req, res) => {
     credits: 100,
     stats: { played: 0, won: 0, lost: 0, roundsPlayed: 0, roundsWon: 0, tricksWon: 0 },
     createdAt: Date.now(),
-    token: generateToken()
+    token: generateToken(clean, hashPassword(password))
   };
   db.users.push(user);
   saveDB(db);
@@ -114,22 +126,63 @@ app.post('/api/login', (req, res) => {
   const db = loadDB();
   const user = db.users.find(u => u.username.toLowerCase() === username.toLowerCase());
   console.log('Login attempt:', username, '| Found user:', !!user, '| Users in DB:', db.users.length);
-  if (!user || user.password !== hashPassword(password)) return res.json({ ok: false, error: 'Wrong username or password' });
-  // Refresh token on login
-  user.token = generateToken();
+  if (!user) {
+    // User not in DB (server may have restarted) - this is a new registration
+    const newUser = {
+      id: 'u_' + crypto.randomBytes(8).toString('hex'),
+      username: (username || '').trim(),
+      password: hashPassword(password),
+      credits: 100,
+      stats: { played: 0, won: 0, lost: 0, roundsPlayed: 0, roundsWon: 0, tricksWon: 0 },
+      createdAt: Date.now(),
+      token: ''
+    };
+    newUser.token = generateToken(newUser.username, newUser.password);
+    db.users.push(newUser);
+    saveDB(db);
+    const { password: _, ...safe } = newUser;
+    return res.json({ ok: true, user: { ...safe, level: getLevel(100) } });
+  }
+  if (user.password !== hashPassword(password)) return res.json({ ok: false, error: 'Wrong password' });
+  user.token = generateToken(user.username, user.password);
   saveDB(db);
   const { password: _, ...safe } = user;
   const level = getLevel(user.credits);
   res.json({ ok: true, user: { ...safe, level } });
 });
 
-// POST /api/auth — validate token
+// POST /api/auth — validate token (works even after server restart)
 app.post('/api/auth', (req, res) => {
   const { token } = req.body || {};
   if (!token) return res.json({ ok: false });
+  
+  // Verify token signature
+  const decoded = verifyToken(token);
+  if (!decoded) return res.json({ ok: false, error: 'Invalid session' });
+  
   const db = loadDB();
-  const user = db.users.find(u => u.token === token);
-  if (!user) return res.json({ ok: false, error: 'Session expired. Please log in again.' });
+  let user = db.users.find(u => u.username.toLowerCase() === decoded.u.toLowerCase());
+  
+  if (!user) {
+    // Server restarted and lost user data - reconstruct from token
+    console.log('Reconstructing user from token:', decoded.u);
+    user = {
+      id: 'u_' + crypto.randomBytes(8).toString('hex'),
+      username: decoded.u,
+      password: decoded.h,
+      credits: 100,
+      stats: { played: 0, won: 0, lost: 0, roundsPlayed: 0, roundsWon: 0, tricksWon: 0 },
+      createdAt: Date.now(),
+      token: token
+    };
+    db.users.push(user);
+    saveDB(db);
+  } else {
+    // Refresh token
+    user.token = token;
+    saveDB(db);
+  }
+  
   const { password: _, ...safe } = user;
   const level = getLevel(user.credits);
   res.json({ ok: true, user: { ...safe, level } });
