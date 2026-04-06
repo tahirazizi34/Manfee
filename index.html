@@ -374,7 +374,7 @@ html,body{height:100%;background:#060f09;}
     <input class="auth-inp" id="auth-username" placeholder="Username" maxlength="20" autocomplete="username">
     <input class="auth-inp" id="auth-password" placeholder="Password (min 8 chars)" type="password" maxlength="40" autocomplete="current-password">
     <div id="auth-err" style="color:#ff6b6b;font-size:11px;text-align:center;min-height:16px;"></div>
-    <button id="auth-submit" onclick="submitAuth()" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:14px;color:#0a1a08;font-size:14px;font-weight:800;cursor:pointer;width:100%;">Login</button>
+    <button id="auth-submit" onclick="if(typeof submitAuth==='function'){submitAuth();}else{alert('App not loaded yet. Please wait a moment and try again.');}" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:14px;color:#0a1a08;font-size:14px;font-weight:800;cursor:pointer;width:100%;">Login</button>
     <div style="font-size:10px;color:rgba(255,255,255,.3);text-align:center;">Progress and credits saved to your account</div>
   </div>
 </div>
@@ -762,10 +762,12 @@ function switchAuthTab(tab){
   document.getElementById('auth-err').textContent='';
 }
 async function submitAuth(){
+  console.log('submitAuth called');
   var btn=document.getElementById('auth-submit');
-  var mode=btn.textContent==='Login'?'login':'signup';
-  var username=document.getElementById('auth-username').value.trim();
-  var password=document.getElementById('auth-password').value;
+  var mode=btn.textContent.trim()==='Login'?'login':'signup';
+  console.log('mode:', mode, 'SERVER_URL:', SERVER_URL);
+  var username=(document.getElementById('auth-username').value||'').trim();
+  var password=document.getElementById('auth-password').value||'';
   var errEl=document.getElementById('auth-err');
   if(!username||!password){errEl.textContent='Please fill in all fields';return;}
   btn.textContent='Please wait...';btn.disabled=true;errEl.textContent='';
@@ -778,7 +780,11 @@ async function submitAuth(){
     localStorage.setItem('tteka_user',JSON.stringify(data.user));
     updateHomeProfile(data.user);
     go('s-name');
-  }catch(e){errEl.textContent='Connection error. Check server.';btn.disabled=false;btn.textContent=mode==='login'?'Login':'Create Account';}
+  }catch(e){
+    console.error('submitAuth error:', e);
+    errEl.textContent='Error: '+e.message;
+    btn.disabled=false;btn.textContent=mode==='login'?'Login':'Create Account';
+  }
 }
 window._logout=function(){
   CURRENT_USER=null;localStorage.removeItem('tteka_token');localStorage.removeItem('tteka_user');sessionStorage.removeItem('tteka_name');
@@ -801,6 +807,8 @@ window._logout=function(){
 })();
 document.getElementById('auth-username').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('auth-password').focus();});
 document.getElementById('auth-password').addEventListener('keydown',function(e){if(e.key==='Enter')submitAuth();});
+window.submitAuth = submitAuth;
+window.switchAuthTab = switchAuthTab;
 /* ══ END AUTH ══ */
 
 
