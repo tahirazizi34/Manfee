@@ -937,6 +937,36 @@ document.getElementById('auth-username').addEventListener('keydown',function(e){
 document.getElementById('auth-password').addEventListener('keydown',function(e){if(e.key==='Enter')submitAuth();});
 window.submitAuth = submitAuth;
 window.switchAuthTab = switchAuthTab;
+
+// Client-side inactivity: warn at 25 min, logout at 30 min
+(function(){
+  var WARN_MS = 25*60*1000;
+  var LOGOUT_MS = 30*60*1000;
+  var lastActive = Date.now();
+  var warnTimer, logoutTimer;
+
+  function resetTimers(){
+    lastActive = Date.now();
+    clearTimeout(warnTimer);
+    clearTimeout(logoutTimer);
+    warnTimer = setTimeout(function(){
+      toast('⚠ You will be logged out in 5 minutes due to inactivity');
+    }, WARN_MS);
+    logoutTimer = setTimeout(function(){
+      if(window._logout){
+        alert('You have been logged out due to 30 minutes of inactivity.');
+        window._logout();
+      }
+    }, LOGOUT_MS);
+  }
+
+  // Reset on any user interaction
+  ['click','keydown','touchstart','mousemove'].forEach(function(evt){
+    document.addEventListener(evt, resetTimers, {passive:true});
+  });
+
+  resetTimers(); // Start timers on load
+})();
 /* ══ END AUTH ══ */
 
 
@@ -1755,8 +1785,14 @@ if (typeof io === 'function') {
   socket = io(SERVER, {transports:['websocket','polling']});
   socket.on('connect', function(){ 
   toast('Connected');
-  // If we're already in lobby when connection establishes, load rooms
   if(document.getElementById('s-lobby').classList.contains('on')) loadRooms();
+});
+
+// Auto-logout when server kicks for inactivity
+socket.on('auto_logout', function(data){
+  alert('You have been logged out: ' + (data.reason || 'Inactivity'));
+  ROOM=null; IS_HOST=false; MY_SEAT=-1;
+  if(window._logout) window._logout();
 });
   socket.on('disconnect', function(){ toast('Disconnected'); });
   socket.on('error_msg', function(msg){ toast('⚠ '+msg); console.error('SERVER ERROR:', msg); alert(msg); });
