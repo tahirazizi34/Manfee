@@ -65,14 +65,15 @@ function verifyToken(token) {
 // ── CREDIT SYSTEM ────────────────────────────────────────────────────
 // Credits awarded per round based on performance
 const CREDITS = {
-  WIN_ROUND: 15,         // team won the round
-  LOSS_ROUND: -5,        // team lost the round
-  HIT_TARGET: 10,        // hit your bid target exactly
-  PERFECT_BID: 20,       // bid exactly right and won every trick you bid
-  WIN_GAME: 50,          // won the whole game
-  LOSS_GAME: -10,        // lost the whole game
-  PLAYED_ROUND: 5,       // just for playing a round
-  TRICK_BONUS: 2,        // per trick above your target
+  WIN_ROUND: 0,          // no points for round win
+  LOSS_ROUND: 0,         // no points for round loss
+  HIT_TARGET: 0,         // no points for hitting target
+  PERFECT_BID: 0,        // no points for perfect bid
+  WIN_GAME: 1,           // win a game = +1 point
+  LOSS_GAME: 0,          // no penalty for losing
+  PLAYED_ROUND: 0,       // no points just for playing
+  TRICK_BONUS: 0,        // no trick bonus
+  LEAVE_GAME: -1,        // leave mid-game = -1 point
 };
 
 function getLevel(credits) {
@@ -612,6 +613,10 @@ function handleLeave(socket) {
 // ── SOCKET EVENTS ─────────────────────────────────────────────────────
 io.on('connection', socket => {
   console.log('Connected:', socket.id);
+  socket.data.lastActivity = Date.now();
+
+  // Update activity on any event
+  socket.onAny(() => { socket.data.lastActivity = Date.now(); });
 
   socket.on('list_rooms', () => {
     socket.emit('rooms_list', Object.values(rooms)
@@ -807,3 +812,18 @@ io.on('connection', socket => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log('T-Teka server running on port', PORT));
+
+// Auto-logout inactive sockets after 30 minutes
+const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, socket] of io.sockets.sockets) {
+    const lastActivity = socket.data.lastActivity || now;
+    if (now - lastActivity > INACTIVITY_LIMIT) {
+      console.log('Auto-logout inactive socket:', id, socket.data.name);
+      socket.emit('auto_logout', { reason: 'Inactive for 30 minutes' });
+      handleLeave(socket);
+      socket.disconnect(true);
+    }
+  }
+}, 60 * 1000); // check every minute
