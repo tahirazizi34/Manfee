@@ -216,10 +216,8 @@ html,body{height:100%;background:#060f09;}
 .pslot.card{background:#fff;border:none;box-shadow:0 4px 16px rgba(0,0,0,.5);}
 .pslot .pr{font-size:15px;font-weight:700;line-height:1;}
 .pslot .ps{font-size:12px;line-height:1;}
-.pslot.hrt .pr,.pslot.hrt .ps{color:#e03030;}
-.pslot.dia .pr,.pslot.dia .ps{color:#e06020;}
-.pslot.spd .pr,.pslot.spd .ps{color:#1a3a7a;}
-.pslot.clb .pr,.pslot.clb .ps{color:#1a6e2e;}
+.pslot.red .pr,.pslot.red .ps{color:#cc0000;}
+.pslot.blk .pr,.pslot.blk .ps{color:#111111;}
 
 /* Player positions */
 .player-pos{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:3;}
@@ -262,7 +260,7 @@ html,body{height:100%;background:#060f09;}
 .hand{padding:10px 8px 12px;background:rgba(0,0,0,.5);border-top:1px solid rgba(255,255,255,.1);flex-shrink:0;}
 .hhint{color:rgba(255,255,255,.35);font-size:9px;letter-spacing:1px;text-align:center;margin-bottom:5px;}
 .hcards{display:flex;flex-wrap:nowrap;justify-content:center;min-height:90px;padding:0 4px 4px;overflow:visible;}
-.hc{width:48px;height:72px;border:1.5px solid #c9a84c;border-radius:7px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;padding:3px;position:relative;flex-shrink:0;user-select:none;touch-action:none;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 8px rgba(0,0,0,.4);margin-right:-14px;background-color:#fff;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='white'/%3E%3Cpath d='M6 0L12 6L6 12L0 6Z' fill='none' stroke='%23c9a84c' stroke-width='0.5' opacity='0.35'/%3E%3Ccircle cx='6' cy='6' r='1.5' fill='%23c9a84c' opacity='0.2'/%3E%3C/svg%3E");}
+.hc{width:48px;height:72px;background:#fff;border:1px solid #ccc;border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;padding:4px;position:relative;flex-shrink:0;user-select:none;touch-action:none;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 6px rgba(0,0,0,.3);margin-right:-14px;}
 .hc:last-child{margin-right:0;}
 .hc:hover:not(.dis){transform:translateY(-18px);box-shadow:0 8px 20px rgba(0,0,0,.6);z-index:10;}
 .hc.dis{opacity:.35;cursor:default;}
@@ -272,17 +270,15 @@ html,body{height:100%;background:#060f09;}
 .hc .cr{font-size:13px;font-weight:700;line-height:1;}
 .hc .cs{font-size:10px;line-height:1;}
 .hc .cc{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16px;}
-.hc.hrt .cr,.hc.hrt .cs,.hc.hrt .cc{color:#e03030;}
-.hc.dia .cr,.hc.dia .cs,.hc.dia .cc{color:#e06020;}
-.hc.spd .cr,.hc.spd .cs,.hc.spd .cc{color:#1a3a7a;}
-.hc.clb .cr,.hc.clb .cs,.hc.clb .cc{color:#1a6e2e;}
-#ghost{position:fixed;width:48px;height:72px;background:#fff;border:2px solid var(--gold);border-radius:8px;pointer-events:none;display:none;flex-direction:column;align-items:flex-start;padding:4px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+.hc.red .cr,.hc.red .cs,.hc.red .cc{color:#cc0000;}
+.hc.blk .cr,.hc.blk .cs,.hc.blk .cc{color:#111111;}
+#ghost{position:fixed;width:48px;height:72px;background:#fff;border:1px solid #ccc;border-radius:6px;pointer-events:none;z-index:999;display:none;flex-direction:column;align-items:flex-start;padding:4px;opacity:.85;}
 #ghost .cr{font-size:13px;font-weight:700;}
 #ghost .cs{font-size:10px;}
-#ghost.hrt .cr,#ghost.hrt .cs{color:#e03030;}
-#ghost.dia .cr,#ghost.dia .cs{color:#e06020;}
-#ghost.spd .cr,#ghost.spd .cs{color:#1a3a7a;}
-#ghost.clb .cr,#ghost.clb .cs{color:#1a6e2e;}
+#ghost.red .cr,#ghost.red .cs{color:#cc0000;}
+
+#ghost.blk .cr,#ghost.blk .cs{color:#111;}
+
 #ghost.blk .cr,#ghost.blk .cs{color:#111;}
 .abar{display:flex;align-items:center;gap:7px;padding:6px 10px;background:rgba(0,0,0,.4);border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;position:relative;z-index:25;}
 .g-chat-bar{flex-shrink:0;background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.06);position:relative;z-index:25;}
@@ -332,7 +328,7 @@ html,body{height:100%;background:#060f09;}
 .opt-btn.b{background:rgba(201,168,76,.1);border:1.5px solid rgba(201,168,76,.5);color:var(--gold);}
 .opt-btn.c{background:rgba(232,201,106,.08);border:1.5px solid rgba(232,201,106,.4);color:#e8c96a;}
 .opt-tag{display:inline-block;background:rgba(201,168,76,.2);border-radius:3px;padding:1px 5px;font-size:9px;margin-left:5px;}
-.mem-cards{display:flex;flex-wrap:nowrap;justify-content:center;margin:8px 0;overflow:visible;}
+.mem-cards{display:flex;flex-wrap:nowrap;justify-content:center;margin:8px 0;overflow:visible;width:100%;}
 .mem-timer{font-size:26px;font-weight:700;color:var(--gold);margin-bottom:8px;}
 #s-result{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#0a2a4a 0%,#051525 70%,#020d18 100%);}
 .rcard{background:rgba(5,15,30,.9);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px 24px;text-align:center;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);}
@@ -1095,7 +1091,7 @@ var RV={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
 var CCW={0:1,1:2,2:3,3:0};
 
 
-function col(s){return{S:'spd',H:'hrt',D:'dia',C:'clb'}[s]||'spd';}
+function col(s){return(s==='H'||s==='D')?'red':'blk';}
 function sym(s){return SYM[s];}
 function rlog(m){let el=document.getElementById('rm-chat');if(el){el.innerHTML+=`<div class="cl sys">${m}</div>`;el.scrollTop=el.scrollHeight;}}
 function glog(m){let el=document.getElementById('g-log');if(el){el.innerHTML+=`<div class="li">${m}</div>`;el.scrollTop=el.scrollHeight;}}
@@ -1155,7 +1151,7 @@ var offMemTimer = null;
 var offSelCard = null; // for click-to-play
 
 /* ── helpers ── */
-function offCol(s){return{S:'spd',H:'hrt',D:'dia',C:'clb'}[s]||'spd';}
+function offCol(s){return(s==='H'||s==='D')?'red':'blk';}
 function offSym(s){return {S:'♠',H:'♥',D:'♦',C:'♣'}[s]||s;}
 function offInits(n){return n?n.slice(0,2).toUpperCase():'?';}
 function offEl(id){return document.getElementById(id);}
@@ -1558,10 +1554,17 @@ function offShowBid3Modal(){
 function offAIBid(seat){
   var so=OG.bids.reduce(function(a,b){return a+(b>=0?b:0);},0);
   var hand=OG.h[seat];
-  var spades=hand.filter(function(c){return c.s==='S';}).length;
-  var high=hand.filter(function(c){return OFF_RV[c.r]>=12;}).length;
+  var trump=OG.trump;
+  var spades=hand.filter(function(c){return c.s===trump;}).length;
+  var aces=hand.filter(function(c){return c.r==='A';}).length;
+  var kings=hand.filter(function(c){return c.r==='K';}).length;
+  var queens=hand.filter(function(c){return c.r==='Q';}).length;
+  // Better bid estimate: trumps + high cards
+  var estimate=spades*0.7 + aces*0.9 + kings*0.4 + queens*0.2;
+  // Add small randomness for realism
+  estimate += (Math.random()-0.5)*0.8;
   var maxBid=Math.max(0,13-so-(3-OG.bidIdx));
-  var b=Math.max(0,Math.min(maxBid,Math.floor(spades*.65+high*.4+Math.random()*1.5)));
+  var b=Math.max(0,Math.min(maxBid,Math.round(estimate)));
   OG.bids[seat]=b;
   var names=[ME.name,AI_NAMES[0],AI_NAMES[1],AI_NAMES[2]];
   offGlog('<b>'+names[seat]+'</b> bid <b>'+b+'</b>');
@@ -1621,10 +1624,10 @@ function offDoSwitch(dealerTeam,dealerNeed,oppNeed,pts){
   var html='';
   sorted.forEach(function(c,i){
     var last=i===sorted.length-1;
-    html+='<div class="hc '+offCol(c.s)+'" style="cursor:default;width:34px;height:54px;margin-right:'+(last?'0':'-10px')+';font-size:10px;padding:2px;">'+
-      '<div class="cr" style="font-size:10px;font-weight:700;">'+c.r+'</div>'+
-      '<div class="cs" style="font-size:8px;">'+offSym(c.s)+'</div>'+
-      '<div class="cc" style="font-size:12px;">'+offSym(c.s)+'</div></div>';
+    html+='<div class="hc '+offCol(c.s)+'" style="cursor:default;width:26px;height:42px;margin-right:'+(last?'0':'-8px')+';padding:2px;border-radius:4px;flex-shrink:0;">'+
+      '<div class="cr" style="font-size:9px;font-weight:800;line-height:1;">'+c.r+'</div>'+
+      '<div class="cs" style="font-size:7px;line-height:1;">'+offSym(c.s)+'</div>'+
+      '</div>';
   });
   offHtml('gmem-cards',html);
   var t=20;offSet('gmem-timer',t);
@@ -1686,14 +1689,23 @@ function offAICanPlay(card,seat){
 }
 
 function offAIPick(seat,pl){
-  var led=OG.led,partner=(seat+2)%4;
-  var trump=OG.trump;
+  var led=OG.led, trump=OG.trump, partner=(seat+2)%4;
+
+  // ── Helpers ──
   function hi(a){return a.reduce(function(x,y){return OFF_RV[y.r]>OFF_RV[x.r]?y:x;});}
   function lo(a){return a.reduce(function(x,y){return OFF_RV[y.r]<OFF_RV[x.r]?y:x;});}
-  function curWin(){
+
+  // Find lowest card that beats a given value in a suit
+  function lowestBeating(cards, minVal){
+    var beaters=cards.filter(function(c){return OFF_RV[c.r]>minVal;});
+    return beaters.length?lo(beaters):null;
+  }
+
+  // Who is currently winning the trick? returns seat index
+  function trickWinner(){
     var best=null,bs=-1;
     for(var i=0;i<4;i++){
-      var c=OG.tk[i];if(!c)continue;
+      var c=OG.tk[i]; if(!c)continue;
       if(!best){best=c;bs=i;continue;}
       if(trump&&c.s===trump&&best.s!==trump){best=c;bs=i;continue;}
       if(trump&&best.s===trump&&c.s!==trump)continue;
@@ -1701,11 +1713,121 @@ function offAIPick(seat,pl){
     }
     return bs;
   }
-  if(!led){var nt=pl.filter(function(c){return c.s!==trump;});return nt.length?hi(nt):hi(pl);}
-  var sc=pl.filter(function(c){return c.s===led;});
-  if(sc.length)return curWin()===partner?lo(sc):hi(sc);
-  if(trump){var tc=pl.filter(function(c){return c.s===trump;});if(tc.length&&curWin()!==partner)return hi(tc);}
-  return lo(pl);
+
+  // Get the current winning card
+  function winCard(){
+    var w=trickWinner(); return w>=0?OG.tk[w]:null;
+  }
+
+  // Is seat on opponent team?
+  function isOpp(s){ return (s%2)!==(seat%2); }
+
+  var winner=trickWinner();
+  var partnerWinning=winner===partner;
+  var oppWinning=winner>=0 && isOpp(winner);
+  var wc=winCard();
+
+  // ══════════════════════════════════════════
+  // LEADING (first to play in trick)
+  // ══════════════════════════════════════════
+  if(!led){
+    var hand=OG.h[seat];
+    var handSize=hand.length;
+
+    // Count tricks still needed by our team
+    var myTeam=(seat%2);
+    var teamTricks=OG.tr[seat]+OG.tr[partner];
+    var teamTarget=myTeam===0?OG.teamTarget[0]:OG.teamTarget[1];
+    var tricksNeeded=Math.max(0,(teamTarget||0)-teamTricks);
+    var tricksLeft=13-OG.tc;
+
+    // Separate cards by type
+    var trumps=pl.filter(function(c){return c.s===trump;});
+    var nonTrumps=pl.filter(function(c){return c.s!==trump;});
+
+    // Count remaining cards in each suit (track played cards)
+    function suitLen(s){ return pl.filter(function(c){return c.s===s;}).length; }
+
+    // Strategy 1: If we need all remaining tricks, lead highest
+    if(tricksNeeded>=tricksLeft && pl.length>0) return hi(pl);
+
+    // Strategy 2: Lead a suit where we have Ace (guaranteed win unless trumped)
+    var aces=nonTrumps.filter(function(c){return c.r==='A';});
+    if(aces.length>0 && OG.tc < 8) return aces[0]; // lead ace early
+
+    // Strategy 3: Lead lowest trump if we have many and need tricks
+    if(trumps.length>=3 && tricksNeeded>0) return lo(trumps);
+
+    // Strategy 4: Lead from long suit (force opponents to follow or void them)
+    var suitCounts={};
+    nonTrumps.forEach(function(c){suitCounts[c.s]=(suitCounts[c.s]||0)+1;});
+    var bestSuit=null,bestCount=0;
+    Object.keys(suitCounts).forEach(function(s){
+      if(suitCounts[s]>bestCount){bestCount=suitCounts[s];bestSuit=s;}
+    });
+    if(bestSuit){
+      var suitCards=nonTrumps.filter(function(c){return c.s===bestSuit;});
+      // Lead low in long suit (let partner win, or probe)
+      return lo(suitCards);
+    }
+
+    // Strategy 5: Lead lowest non-trump to avoid wasting
+    if(nonTrumps.length>0) return lo(nonTrumps);
+    return lo(trumps.length?trumps:pl);
+  }
+
+  // ══════════════════════════════════════════
+  // FOLLOWING SUIT (have led suit cards)
+  // ══════════════════════════════════════════
+  var suitCards=pl.filter(function(c){return c.s===led;});
+  if(suitCards.length>0){
+    // Partner is winning → play LOWEST to save high cards
+    if(partnerWinning) return lo(suitCards);
+
+    // Opponent winning → try to beat with LOWEST winning card
+    if(oppWinning && wc){
+      var beater=lowestBeating(suitCards, OFF_RV[wc.r]);
+      if(beater) return beater;
+      // Can't beat → play lowest
+      return lo(suitCards);
+    }
+
+    // No one winning yet (we're first to follow) → play highest
+    return hi(suitCards);
+  }
+
+  // ══════════════════════════════════════════
+  // DISCARDING (no led suit)
+  // ══════════════════════════════════════════
+  var trumpCards=pl.filter(function(c){return c.s===trump;});
+  var nonTrumpCards=pl.filter(function(c){return c.s!==trump;});
+
+  // Partner winning → discard lowest useless non-trump
+  if(partnerWinning){
+    if(nonTrumpCards.length>0) return lo(nonTrumpCards);
+    return lo(trumpCards.length?trumpCards:pl);
+  }
+
+  // Opponent winning → consider trumping in
+  if(oppWinning){
+    if(trumpCards.length>0){
+      // Already trumped by opponent? Need a higher trump
+      if(wc && wc.s===trump){
+        var higherTrump=lowestBeating(trumpCards, OFF_RV[wc.r]);
+        if(higherTrump) return higherTrump;
+        // Can't beat their trump → discard lowest non-trump
+        if(nonTrumpCards.length>0) return lo(nonTrumpCards);
+        return lo(trumpCards);
+      }
+      // Not trumped yet → trump with LOWEST trump
+      return lo(trumpCards);
+    }
+    // No trumps → discard lowest non-trump
+    return lo(nonTrumpCards.length?nonTrumpCards:pl);
+  }
+
+  // Fallback
+  return lo(pl.length?pl:[{r:'2',s:'S'}]);
 }
 
 /* ── resolve trick ── */
@@ -1805,7 +1927,7 @@ socket.on('auto_logout', function(data){
 
 function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');if(id==='s-game')setTimeout(posSlots,40);}
 function inits(n){return n?n.slice(0,2).toUpperCase():'?';}
-function col(s){return{S:'spd',H:'hrt',D:'dia',C:'clb'}[s]||'spd';}
+function col(s){return(s==='H'||s==='D')?'red':'blk';}
 function sym(s){return SYM[s];}
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 // Note: go/inits/toast also defined outside initGame for home screen buttons
@@ -2463,7 +2585,7 @@ function showDealerModal(bidsTotal,oppBid){
 function showMemorizeModal(){
   let ov=document.getElementById('gov-mem');ov.classList.add('on');
   document.getElementById('gmem-sub').textContent='Hands rotated! Memorize your new cards.';
-  document.getElementById('gmem-cards').innerHTML=[...G.hand].sort((a,b)=>{let o=['S','H','C','D'];return(o.indexOf(a.s)-o.indexOf(b.s))||(RV[b.r]-RV[a.r]);}).map((c,i,arr)=>`<div class="hc ${col(c.s)}" style="cursor:default;width:34px;height:54px;margin-right:${i===arr.length-1?'0':'-10px'};padding:2px;"><div class="cr" style="font-size:10px;font-weight:700;">${c.r}</div><div class="cs" style="font-size:8px;">${sym(c.s)}</div><div class="cc" style="font-size:12px;">${sym(c.s)}</div></div>`).join('');
+  document.getElementById('gmem-cards').innerHTML=[...G.hand].sort((a,b)=>{let o=['S','H','C','D'];return(o.indexOf(a.s)-o.indexOf(b.s))||(RV[b.r]-RV[a.r]);}).map((c,i,arr)=>`<div class="hc ${col(c.s)}" style="cursor:default;width:26px;height:42px;margin-right:${i===arr.length-1?'0':'-8px'};padding:2px;border-radius:4px;flex-shrink:0;"><div class="cr" style="font-size:9px;font-weight:800;line-height:1;">${c.r}</div><div class="cs" style="font-size:7px;line-height:1;">${sym(c.s)}</div></div>`).join('');
   let t=30;document.getElementById('gmem-timer').textContent=t;
   if(memTimer)clearInterval(memTimer);
   memTimer=setInterval(()=>{t--;document.getElementById('gmem-timer').textContent=t;if(t<=0){clearInterval(memTimer);memTimer=null;}},1000);
