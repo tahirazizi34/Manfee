@@ -489,6 +489,7 @@ html,body{height:100%;background:#060f09;}
       </button>
     </div>
     <div class="home-hint" id="home-hint">Enter your name to start playing</div>
+    <button onclick="window._showReplays&&window._showReplays()" style="background:none;border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 24px;color:rgba(255,255,255,.5);font-size:11px;cursor:pointer;margin-top:8px;letter-spacing:.5px;">▶ Watch Replays</button>
   </div>
 </div>
 
@@ -872,10 +873,12 @@ html,body{height:100%;background:#060f09;}
 <script>
 
 
+
 /* ══ AUTH + CREDITS ══ */
 var CURRENT_USER=null;
 var SERVER_URL=(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1')
   ?'http://localhost:3000':window.location.origin;
+window.SERVER_URL=SERVER_URL;
 
 function levelColor(cr){
   if(cr>=2000)return'#ff4444';if(cr>=1500)return'#ff6600';if(cr>=1100)return'#ffaa00';
@@ -2066,7 +2069,8 @@ socket.on('idle_warning',({seat})=>{
   var name=names[seat]?names[seat].name:'A player';
   if(seat===MY_SEAT){
     gmsg('<span style="color:#ff6b6b">⚠ Play your card or it will be auto-played!</span>');
-    playIdleWarningSound();
+    if(typeof playIdleWarningSound==='function') playIdleWarningSound();
+    else if(typeof window.playIdleWarningSound==='function') window.playIdleWarningSound();
     toast('⚠ Play your card now!');
   } else {
     glog('<span style="color:#ffaa44">⏳ Waiting for '+name+'...</span>');
@@ -2783,164 +2787,14 @@ window._startGame = function(){
 
 
 
-/* ══ REPLAY SYSTEM ══ */
-var _currentReplay = null;
-var _replayIdx = 0;
-var _replayAuto = null;
 
-var SYM_MAP = {S:'♠',H:'♥',D:'♦',C:'♣'};
+// Replay system defined outside initGame
 
-window._showReplays = function(){
-  go('s-replays');
-  var list = document.getElementById('replay-list');
-  list.innerHTML = '<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">Loading...</div>';
-  fetch(SERVER_URL + '/api/replays')
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(!data.ok || !data.replays.length){
-        list.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">No replays yet. Play some games first!</div>';
-        return;
-      }
-      list.innerHTML = data.replays.map(function(r){
-        var date = new Date(r.startTime).toLocaleDateString();
-        var dur = r.duration ? Math.floor(r.duration/60)+'m '+( r.duration%60)+'s' : 'In progress';
-        var score = r.finalScores ? r.finalScores[0]+' – '+r.finalScores[1] : '—';
-        var players = r.players.join(' · ');
-        return '<div class="replay-card" onclick="window._loadReplay(\''+r.code+'\')">'+
-          '<div class="replay-card-players">'+players+'</div>'+
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">'+
-          '<div class="replay-card-meta">'+date+' · '+(r.mode||'Manfee')+' · '+dur+'</div>'+
-          '<div class="replay-card-score">'+score+'</div>'+
-          '</div></div>';
-      }).join('');
-    })
-    .catch(function(){
-      list.innerHTML='<div style="color:#ff6b6b;text-align:center;padding:40px;">Could not load replays</div>';
-    });
-};
-
-window._loadReplay = function(code){
-  fetch(SERVER_URL + '/api/replay/' + code)
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(!data.ok){alert('Replay not found');return;}
-      _currentReplay = data.replay;
-      _replayIdx = 0;
-      _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
-      go('s-replay-view');
-      // Set title
-      var players = _currentReplay.players.map(function(p){return p.name;});
-      document.getElementById('replay-title').textContent = players.join(' vs ');
-      document.getElementById('replay-info').textContent =
-        (_currentReplay.mode||'Manfee') + ' · ' + new Date(_currentReplay.startTime).toLocaleString();
-      _renderReplayMove();
-    });
-};
-
-var _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
-
-function _renderReplayMove(){
-  var moves = _currentReplay.moves;
-  var idx = _replayIdx;
-  document.getElementById('replay-move-lbl').textContent = 'Move '+(idx+1)+'/'+moves.length;
-
-  // Apply move
-  var move = moves[idx];
-  var log = document.getElementById('rv-log');
-  var players = _currentReplay.players.map(function(p){return p.name;});
-
-  if(move.type === 'deal'){
-    _replayState.round = move.round;
-    _replayState.scores = move.scores ? [...move.scores] : _replayState.scores;
-    _replayState.table = [null,null,null,null];
-    _replayState.hands = move.hands ? move.hands.map(function(h){return [...h];}) : [[],[],[],[]];
-    log.innerHTML += '<div>Round '+move.round+' — Dealer: <b>'+players[move.dealer]+'</b></div>';
-  } else if(move.type === 'bid'){
-    log.innerHTML += '<div><b>'+players[move.seat]+'</b> bid <b>'+move.bid+'</b></div>';
-  } else if(move.type === 'card'){
-    _replayState.table[move.seat] = move.card;
-    if(move.card && _replayState.hands[move.seat]){
-      var h = _replayState.hands[move.seat];
-      var i = h.findIndex(function(c){return c.r===move.card.r&&c.s===move.card.s;});
-      if(i>=0) h.splice(i,1);
-    }
-    var sym = SYM_MAP[move.card.s]||'?';
-    log.innerHTML += '<div><b>'+players[move.seat]+'</b> played <b>'+move.card.r+sym+'</b></div>';
-  } else if(move.type === 'round_end'){
-    _replayState.scores = move.scores ? [...move.scores] : _replayState.scores;
-    log.innerHTML += '<div style="color:#c9a84c">Score: '+_replayState.scores[0]+' – '+_replayState.scores[1]+(move.gameOver?' 🏆 '+move.winner+' wins!':'')+'</div>';
-  }
-
-  log.scrollTop = log.scrollHeight;
-  document.getElementById('rv-sc0').textContent = _replayState.scores[0];
-  document.getElementById('rv-sc1').textContent = _replayState.scores[1];
-  document.getElementById('rv-round').textContent = 'Round '+_replayState.round;
-
-  // Render table cards
-  var table = document.getElementById('rv-table');
-  var W = table.offsetWidth || 280, H = table.offsetHeight || 200;
-  var cx=W/2, cy=H/2;
-  var positions=[
-    {x:cx-18,y:cy+10},  // seat 0 (bottom)
-    {x:cx+30,y:cy-27}, // seat 1 (right)
-    {x:cx-18,y:cy-64}, // seat 2 (top)
-    {x:cx-66,y:cy-27}  // seat 3 (left)
-  ];
-  table.innerHTML = '';
-  _replayState.table.forEach(function(card, seat){
-    if(!card) return;
-    var pos = positions[seat];
-    var cls = (card.s==='H'||card.s==='D')?'red':'blk';
-    var sym = SYM_MAP[card.s]||'?';
-    var el = document.createElement('div');
-    el.className = 'rv-card '+cls;
-    el.style.left = pos.x+'px';
-    el.style.top = pos.y+'px';
-    el.innerHTML = '<div class="cr" style="font-size:12px;font-weight:800;">'+card.r+'</div>'+
-      '<div class="cs" style="font-size:10px;">'+sym+'</div>';
-    table.appendChild(el);
-  });
-
-  // Button states
-  document.getElementById('replay-prev').disabled = idx<=0;
-  document.getElementById('replay-next').disabled = idx>=moves.length-1;
-}
-
-// Wire replay viewer buttons
-document.getElementById('replay-back').onclick = function(){
-  clearInterval(_replayAuto); _replayAuto=null;
-  document.getElementById('replay-play').textContent='▶ Auto';
-  go('s-replays');
-};
-document.getElementById('replay-prev').onclick = function(){
-  if(_replayIdx>0){_replayIdx--;_renderReplayMove();}
-};
-document.getElementById('replay-next').onclick = function(){
-  if(_replayIdx<_currentReplay.moves.length-1){_replayIdx++;_renderReplayMove();}
-};
-document.getElementById('replay-play').onclick = function(){
-  if(_replayAuto){
-    clearInterval(_replayAuto); _replayAuto=null;
-    this.textContent='▶ Auto';
-  } else {
-    this.textContent='⏸ Pause';
-    _replayAuto = setInterval(function(){
-      if(_replayIdx>=_currentReplay.moves.length-1){
-        clearInterval(_replayAuto); _replayAuto=null;
-        document.getElementById('replay-play').textContent='▶ Auto';
-        return;
-      }
-      _replayIdx++; _renderReplayMove();
-    }, 800);
-  }
-};
-/* ══ END REPLAY ══ */
 
 /* ══ IDLE WARNING ══ */
 function playIdleWarningSound(){
   try{
     var ctx=new(window.AudioContext||window.webkitAudioContext)();
-    // Three urgent beeps
     [0,0.25,0.5].forEach(function(delay){
       var o=ctx.createOscillator(), g=ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
@@ -2954,9 +2808,11 @@ function playIdleWarningSound(){
     });
   }catch(e){}
 }
+window.playIdleWarningSound = playIdleWarningSound;
 /* ══ END IDLE WARNING ══ */
 
 } // end initGame
+
 
 
 </script>
@@ -3432,6 +3288,166 @@ function initBlackjack(){
 }
 /* ══ END BLACKJACK ══ */
 window.initBlackjack=initBlackjack;
+</script>
+
+<script>
+/* ══ REPLAY SYSTEM ══ */
+var _currentReplay = null;
+var _replayIdx = 0;
+var _replayAuto = null;
+
+var SYM_MAP = {S:'♠',H:'♥',D:'♦',C:'♣'};
+
+window._showReplays = function(){
+  if(typeof go !== 'function'){alert('Game not loaded yet');return;}
+  go('s-replays');
+  var list = document.getElementById('replay-list');
+  if(!list){console.error('replay-list not found');return;}
+  list.innerHTML = '<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">Loading...</div>';
+  var url=(window.SERVER_URL||window.location.origin)+'/api/replays';
+  console.log('Fetching replays from:', url);
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data.ok || !data.replays.length){
+        list.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">No replays yet. Play some games first!</div>';
+        return;
+      }
+      list.innerHTML = data.replays.map(function(r){
+        var date = new Date(r.startTime).toLocaleDateString();
+        var dur = r.duration ? Math.floor(r.duration/60)+'m '+( r.duration%60)+'s' : 'In progress';
+        var score = r.finalScores ? r.finalScores[0]+' – '+r.finalScores[1] : '—';
+        var players = r.players.join(' · ');
+        return '<div class="replay-card" onclick="window._loadReplay(\''+r.code+'\')">'+
+          '<div class="replay-card-players">'+players+'</div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">'+
+          '<div class="replay-card-meta">'+date+' · '+(r.mode||'Manfee')+' · '+dur+'</div>'+
+          '<div class="replay-card-score">'+score+'</div>'+
+          '</div></div>';
+      }).join('');
+    })
+    .catch(function(e){
+      console.error('Replay fetch error:', e);
+      list.innerHTML='<div style="color:#ff6b6b;text-align:center;padding:40px;">Could not load replays: '+e.message+'</div>';
+    });
+};
+
+window._loadReplay = function(code){
+  fetch((window.SERVER_URL||window.location.origin) + '/api/replay/' + code)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data.ok){alert('Replay not found');return;}
+      _currentReplay = data.replay;
+      _replayIdx = 0;
+      _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
+      go('s-replay-view');
+      // Set title
+      var players = _currentReplay.players.map(function(p){return p.name;});
+      document.getElementById('replay-title').textContent = players.join(' vs ');
+      document.getElementById('replay-info').textContent =
+        (_currentReplay.mode||'Manfee') + ' · ' + new Date(_currentReplay.startTime).toLocaleString();
+      _renderReplayMove();
+    });
+};
+
+var _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
+
+function _renderReplayMove(){
+  var moves = _currentReplay.moves;
+  var idx = _replayIdx;
+  document.getElementById('replay-move-lbl').textContent = 'Move '+(idx+1)+'/'+moves.length;
+
+  // Apply move
+  var move = moves[idx];
+  var log = document.getElementById('rv-log');
+  var players = _currentReplay.players.map(function(p){return p.name;});
+
+  if(move.type === 'deal'){
+    _replayState.round = move.round;
+    _replayState.scores = move.scores ? [...move.scores] : _replayState.scores;
+    _replayState.table = [null,null,null,null];
+    _replayState.hands = move.hands ? move.hands.map(function(h){return [...h];}) : [[],[],[],[]];
+    log.innerHTML += '<div>Round '+move.round+' — Dealer: <b>'+players[move.dealer]+'</b></div>';
+  } else if(move.type === 'bid'){
+    log.innerHTML += '<div><b>'+players[move.seat]+'</b> bid <b>'+move.bid+'</b></div>';
+  } else if(move.type === 'card'){
+    _replayState.table[move.seat] = move.card;
+    if(move.card && _replayState.hands[move.seat]){
+      var h = _replayState.hands[move.seat];
+      var i = h.findIndex(function(c){return c.r===move.card.r&&c.s===move.card.s;});
+      if(i>=0) h.splice(i,1);
+    }
+    var sym = SYM_MAP[move.card.s]||'?';
+    log.innerHTML += '<div><b>'+players[move.seat]+'</b> played <b>'+move.card.r+sym+'</b></div>';
+  } else if(move.type === 'round_end'){
+    _replayState.scores = move.scores ? [...move.scores] : _replayState.scores;
+    log.innerHTML += '<div style="color:#c9a84c">Score: '+_replayState.scores[0]+' – '+_replayState.scores[1]+(move.gameOver?' 🏆 '+move.winner+' wins!':'')+'</div>';
+  }
+
+  log.scrollTop = log.scrollHeight;
+  document.getElementById('rv-sc0').textContent = _replayState.scores[0];
+  document.getElementById('rv-sc1').textContent = _replayState.scores[1];
+  document.getElementById('rv-round').textContent = 'Round '+_replayState.round;
+
+  // Render table cards
+  var table = document.getElementById('rv-table');
+  var W = table.offsetWidth || 280, H = table.offsetHeight || 200;
+  var cx=W/2, cy=H/2;
+  var positions=[
+    {x:cx-18,y:cy+10},  // seat 0 (bottom)
+    {x:cx+30,y:cy-27}, // seat 1 (right)
+    {x:cx-18,y:cy-64}, // seat 2 (top)
+    {x:cx-66,y:cy-27}  // seat 3 (left)
+  ];
+  table.innerHTML = '';
+  _replayState.table.forEach(function(card, seat){
+    if(!card) return;
+    var pos = positions[seat];
+    var cls = (card.s==='H'||card.s==='D')?'red':'blk';
+    var sym = SYM_MAP[card.s]||'?';
+    var el = document.createElement('div');
+    el.className = 'rv-card '+cls;
+    el.style.left = pos.x+'px';
+    el.style.top = pos.y+'px';
+    el.innerHTML = '<div class="cr" style="font-size:12px;font-weight:800;">'+card.r+'</div>'+
+      '<div class="cs" style="font-size:10px;">'+sym+'</div>';
+    table.appendChild(el);
+  });
+
+  // Button states
+  document.getElementById('replay-prev').disabled = idx<=0;
+  document.getElementById('replay-next').disabled = idx>=moves.length-1;
+}
+
+// Wire replay viewer buttons
+document.getElementById('replay-back').onclick = function(){
+  clearInterval(_replayAuto); _replayAuto=null;
+  document.getElementById('replay-play').textContent='▶ Auto';
+  go('s-replays');
+};
+document.getElementById('replay-prev').onclick = function(){
+  if(_replayIdx>0){_replayIdx--;_renderReplayMove();}
+};
+document.getElementById('replay-next').onclick = function(){
+  if(_replayIdx<_currentReplay.moves.length-1){_replayIdx++;_renderReplayMove();}
+};
+document.getElementById('replay-play').onclick = function(){
+  if(_replayAuto){
+    clearInterval(_replayAuto); _replayAuto=null;
+    this.textContent='▶ Auto';
+  } else {
+    this.textContent='⏸ Pause';
+    _replayAuto = setInterval(function(){
+      if(_replayIdx>=_currentReplay.moves.length-1){
+        clearInterval(_replayAuto); _replayAuto=null;
+        document.getElementById('replay-play').textContent='▶ Auto';
+        return;
+      }
+      _replayIdx++; _renderReplayMove();
+    }, 800);
+  }
+};
+/* ══ END REPLAY ══ */
 </script>
 
 <script>
