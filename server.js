@@ -227,6 +227,23 @@ function updateStats(userId, statsUpdate) {
 }
 
 // ── STATIC FILE SERVING ───────────────────────────────────────────────
+// Replay API
+app.get('/api/replays', (req, res) => {
+  const list = Object.values(replays).map(r => ({
+    code: r.code, players: r.players.map(p => p.name), mode: r.mode,
+    startTime: r.startTime, endTime: r.endTime||null,
+    finalScores: r.finalScores||r.scores||[0,0],
+    moveCount: r.moves.length,
+    duration: r.endTime?Math.round((r.endTime-r.startTime)/1000):null
+  })).sort((a,b)=>b.startTime-a.startTime);
+  res.json({ ok:true, replays:list });
+});
+app.get('/api/replay/:code', (req, res) => {
+  const replay = replays[req.params.code];
+  if (!replay) return res.json({ ok:false, error:'Replay not found' });
+  res.json({ ok:true, replay });
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
 app.get('/', (req, res) => {
@@ -241,6 +258,8 @@ app.get('/', (req, res) => {
 
 // ── HELPERS ───────────────────────────────────────────────────────────
 const rooms = {};
+const replays = {}; // stored replays: code -> {moves[], startTime, players}
+const MAX_REPLAYS = 50; // keep last 50 replays in memory
 
 // Pre-load DB on startup
 loadDB();
@@ -287,6 +306,20 @@ function dealRound(code) {
   const room = rooms[code];
   if (!room) return;
   const g = room.game;
+  // Init or continue replay recording
+  if (!replays[code]) {
+    replays[code] = {
+      code,
+      startTime: Date.now(),
+      players: room.seats.map(s => ({ name: s?.name || 'AI', id: s?.id })),
+      mode: room.mode,
+      moves: [],
+      scores: [0, 0]
+    };
+    // Keep only MAX_REPLAYS
+    const keys = Object.keys(replays);
+    if (keys.length > MAX_REPLAYS) delete replays[keys[0]];
+  }
   if (g.dealer < 0) g.dealer = Math.floor(Math.random() * 4);
   else g.dealer = (g.dealer + 1) % 4;
   g.round = (g.round || 0) + 1;
@@ -448,8 +481,44 @@ function askPlay(code) {
   const g = room.game;
   const seat = g.turn;
   const player = room.seats[seat];
-  if (!player || player.id.startsWith('ai_')) setTimeout(() => aiPlay(code, seat), 700);
-  else io.to(player.id).emit('your_turn');
+  if (!player || player.id.startsWith('ai_')) {
+    setTimeout(() => aiPlay(code, seat), 700);
+  } else {
+    io.to(player.id).emit('your_turn');
+    io.to(code).emit('turn_started', { seat, time: Date.now() });
+    g.turnStarted = Date.now();
+    g.turnSeat = seat;
+
+    // Warn after 20 seconds
+    clearTimeout(g.idleWarn);
+    g.idleWarn = setTimeout(() => {
+      const r = rooms[code];
+      if (!r || r.game.turnSeat !== seat) return;
+      io.to(player.id).emit('idle_warning', { seat, seconds: 20 });
+      io.to(code).emit('idle_warning', { seat, seconds: 20 });
+    }, 20000);
+
+    // Auto-play lowest card after 45 seconds
+    clearTimeout(g.idleAuto);
+    g.idleAuto = setTimeout(() => {
+      const r = rooms[code];
+      if (!r || r.game.turn !== seat || r.game.phase !== 'play') return;
+      const hand = r.game.hands[seat];
+      if (!hand || !hand.length) return;
+      // Play lowest legal card
+      const legal = hand.filter(c => canPlay(c, hand, r.game.led));
+      const card = legal.length ? legal.reduce((a,b) => RV[a.r]<RV[b.r]?a:b) : hand[0];
+      io.to(code).emit('auto_played', { seat, reason: 'idle' });
+      playCard(code, seat, card);
+    }, 45000);
+  }
+}
+
+function clearTurnTimers(code) {
+  const room = rooms[code];
+  if (!room) return;
+  clearTimeout(room.game.idleWarn);
+  clearTimeout(room.game.idleAuto);
 }
 
 function aiPlay(code, seat) {
@@ -484,6 +553,11 @@ function aiPickCard(seat, pl, g) {
   return lo(pl);
 }
 
+function recordMove(code, type, data) {
+  if (!replays[code]) return;
+  replays[code].moves.push({ t: Date.now() - replays[code].startTime, type, ...data });
+}
+
 function playCard(code, seat, card) {
   const room = rooms[code];
   if (!room) return;
@@ -494,6 +568,7 @@ function playCard(code, seat, card) {
   g.tk[seat] = card;
   if (!g.led) g.led = card.s;
   const nextTurn = (seat+1)%4;
+  recordMove(code, 'card', { seat, card, led: g.led });
   io.to(code).emit('card_played', { seat, card, led: g.led, nextTurn, cardCounts: g.hands.map(h=>h.length) });
   if (g.tk.every(c => c !== null)) setTimeout(() => resolveTrick(code), 800);
   else { g.turn = nextTurn; askPlay(code); }
@@ -583,6 +658,12 @@ function endRound(code) {
     }
   }
 
+  replays[code] && (replays[code].scores = [...g.scores]);
+  recordMove(code, 'round_end', { scores: [...g.scores], p0, p1, gameOver, winner: gameOver?winner:null });
+  if (gameOver && replays[code]) {
+    replays[code].endTime = Date.now();
+    replays[code].finalScores = [...g.scores];
+  }
   io.to(code).emit('round_result', {
     scores:[...g.scores], pts:[p0,p1], detail:det, gameOver,
     winner: gameOver?winner:null
@@ -769,6 +850,7 @@ io.on('connection', socket => {
   socket.on('play_card', ({ code, card }) => {
     const room=rooms[code];if(!room)return;
     const g=room.game;
+    clearTurnTimers(code);
     const seat=room.seats.findIndex(s=>s&&s.id===socket.id);
     if(seat<0||seat!==g.turn)return;
     playCard(code,seat,card);
