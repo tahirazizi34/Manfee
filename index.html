@@ -378,10 +378,62 @@ html,body{height:100%;background:#060f09;}
 .bj-spl{background:rgba(100,200,255,.2);color:#80ccff;}
 .bj-ins{background:rgba(255,100,100,.2);color:#ff8080;}
 
+
+/* ── REPLAYS ── */
+.replay-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;cursor:pointer;transition:background .2s;}
+.replay-card:hover{background:rgba(255,255,255,.1);}
+.replay-card-players{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;}
+.replay-card-meta{font-size:10px;color:rgba(255,255,255,.4);}
+.replay-card-score{font-size:12px;font-weight:700;color:#c9a84c;}
+.rv-card{width:36px;height:54px;background:#fff;border:1px solid #ccc;border-radius:5px;display:flex;flex-direction:column;align-items:flex-start;padding:3px;position:absolute;box-shadow:0 2px 8px rgba(0,0,0,.6);transition:all .3s;}
+.rv-card.red .cr,.rv-card.red .cs{color:#cc0000;}
+.rv-card.blk .cr,.rv-card.blk .cs{color:#111;}
+
 </style>
 </head>
 <body>
 <div id="app">
+
+<div id="s-replays" class="scr" style="background:radial-gradient(ellipse at 50% 40%,#0a2a4a,#051525,#020d18);">
+  <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(0,0,0,.4);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;">
+    <button onclick="go('s-name')" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;">‹</button>
+    <h2 style="flex:1;font-size:16px;font-weight:700;color:#fff;margin:0;">▶ Replays</h2>
+  </div>
+  <div id="replay-list" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+    <div style="color:rgba(255,255,255,.4);text-align:center;font-size:13px;padding:40px 0;">Loading replays...</div>
+  </div>
+</div>
+
+<!-- Replay Viewer -->
+<div id="s-replay-view" class="scr" style="background:#020d18;">
+  <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(0,0,0,.5);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;">
+    <button id="replay-back" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;">‹</button>
+    <div style="flex:1;">
+      <div id="replay-title" style="font-size:14px;font-weight:700;color:#fff;"></div>
+      <div id="replay-info" style="font-size:10px;color:rgba(255,255,255,.4);"></div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button id="replay-prev" style="background:rgba(255,255,255,.1);border:none;border-radius:6px;padding:6px 10px;color:#fff;cursor:pointer;font-size:14px;">◀</button>
+      <span id="replay-move-lbl" style="font-size:11px;color:rgba(255,255,255,.5);min-width:60px;text-align:center;">Move 0</span>
+      <button id="replay-next" style="background:rgba(255,255,255,.1);border:none;border-radius:6px;padding:6px 10px;color:#fff;cursor:pointer;font-size:14px;">▶</button>
+      <button id="replay-play" style="background:var(--gold);border:none;border-radius:6px;padding:6px 12px;color:#0a1a08;font-size:11px;font-weight:700;cursor:pointer;">▶ Auto</button>
+    </div>
+  </div>
+  <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;padding:12px;gap:8px;">
+    <!-- Score bar -->
+    <div style="display:flex;justify-content:space-between;background:rgba(0,0,0,.4);border-radius:8px;padding:8px 12px;">
+      <div style="text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,.4);">TEAM A</div><div id="rv-sc0" style="font-size:20px;font-weight:800;color:#4488ff;">0</div></div>
+      <div id="rv-round" style="font-size:11px;color:rgba(255,255,255,.4);align-self:center;">Round 1</div>
+      <div style="text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,.4);">TEAM B</div><div id="rv-sc1" style="font-size:20px;font-weight:800;color:#ff4488;">0</div></div>
+    </div>
+    <!-- Table -->
+    <div style="flex:1;position:relative;background:rgba(0,60,0,.3);border-radius:12px;border:1px solid rgba(0,100,0,.4);">
+      <div id="rv-table" style="width:100%;height:100%;position:relative;"></div>
+    </div>
+    <!-- Event log -->
+    <div id="rv-log" style="height:60px;overflow-y:auto;background:rgba(0,0,0,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:rgba(255,255,255,.6);"></div>
+  </div>
+</div>
 
 <div id="s-auth" class="scr on" style="background:radial-gradient(ellipse at 50% 40%,#0a2a4a,#051525,#020d18);justify-content:center;align-items:center;">
   <div style="width:90%;max-width:340px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:32px 24px;display:flex;flex-direction:column;gap:14px;">
@@ -2009,6 +2061,24 @@ socket.on('credits_update',({credits,level,change,reason})=>{
   if(cb)cb.textContent=credits+' cr';
 });
 
+socket.on('idle_warning',({seat})=>{
+  var names=G.seatOrder||[];
+  var name=names[seat]?names[seat].name:'A player';
+  if(seat===MY_SEAT){
+    gmsg('<span style="color:#ff6b6b">⚠ Play your card or it will be auto-played!</span>');
+    playIdleWarningSound();
+    toast('⚠ Play your card now!');
+  } else {
+    glog('<span style="color:#ffaa44">⏳ Waiting for '+name+'...</span>');
+  }
+});
+
+socket.on('auto_played',({seat,reason})=>{
+  var names=G.seatOrder||[];
+  var name=names[seat]?names[seat].name:'A player';
+  glog('<span style="color:#ff6b6b">⚡ '+name+' auto-played (idle)</span>');
+});
+
 socket.on('chat_msg',({name,msg})=>{
   addChatMsg(name,msg,false);
   if(document.getElementById('s-game').classList.contains('on')){
@@ -2711,6 +2781,180 @@ window._startGame = function(){
 
 // Blackjack defined outside initGame
 
+
+
+/* ══ REPLAY SYSTEM ══ */
+var _currentReplay = null;
+var _replayIdx = 0;
+var _replayAuto = null;
+
+var SYM_MAP = {S:'♠',H:'♥',D:'♦',C:'♣'};
+
+window._showReplays = function(){
+  go('s-replays');
+  var list = document.getElementById('replay-list');
+  list.innerHTML = '<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">Loading...</div>';
+  fetch(SERVER_URL + '/api/replays')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data.ok || !data.replays.length){
+        list.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">No replays yet. Play some games first!</div>';
+        return;
+      }
+      list.innerHTML = data.replays.map(function(r){
+        var date = new Date(r.startTime).toLocaleDateString();
+        var dur = r.duration ? Math.floor(r.duration/60)+'m '+( r.duration%60)+'s' : 'In progress';
+        var score = r.finalScores ? r.finalScores[0]+' – '+r.finalScores[1] : '—';
+        var players = r.players.join(' · ');
+        return '<div class="replay-card" onclick="window._loadReplay(\''+r.code+'\')">'+
+          '<div class="replay-card-players">'+players+'</div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">'+
+          '<div class="replay-card-meta">'+date+' · '+(r.mode||'Manfee')+' · '+dur+'</div>'+
+          '<div class="replay-card-score">'+score+'</div>'+
+          '</div></div>';
+      }).join('');
+    })
+    .catch(function(){
+      list.innerHTML='<div style="color:#ff6b6b;text-align:center;padding:40px;">Could not load replays</div>';
+    });
+};
+
+window._loadReplay = function(code){
+  fetch(SERVER_URL + '/api/replay/' + code)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data.ok){alert('Replay not found');return;}
+      _currentReplay = data.replay;
+      _replayIdx = 0;
+      _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
+      go('s-replay-view');
+      // Set title
+      var players = _currentReplay.players.map(function(p){return p.name;});
+      document.getElementById('replay-title').textContent = players.join(' vs ');
+      document.getElementById('replay-info').textContent =
+        (_currentReplay.mode||'Manfee') + ' · ' + new Date(_currentReplay.startTime).toLocaleString();
+      _renderReplayMove();
+    });
+};
+
+var _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
+
+function _renderReplayMove(){
+  var moves = _currentReplay.moves;
+  var idx = _replayIdx;
+  document.getElementById('replay-move-lbl').textContent = 'Move '+(idx+1)+'/'+moves.length;
+
+  // Apply move
+  var move = moves[idx];
+  var log = document.getElementById('rv-log');
+  var players = _currentReplay.players.map(function(p){return p.name;});
+
+  if(move.type === 'deal'){
+    _replayState.round = move.round;
+    _replayState.scores = move.scores ? [...move.scores] : _replayState.scores;
+    _replayState.table = [null,null,null,null];
+    _replayState.hands = move.hands ? move.hands.map(function(h){return [...h];}) : [[],[],[],[]];
+    log.innerHTML += '<div>Round '+move.round+' — Dealer: <b>'+players[move.dealer]+'</b></div>';
+  } else if(move.type === 'bid'){
+    log.innerHTML += '<div><b>'+players[move.seat]+'</b> bid <b>'+move.bid+'</b></div>';
+  } else if(move.type === 'card'){
+    _replayState.table[move.seat] = move.card;
+    if(move.card && _replayState.hands[move.seat]){
+      var h = _replayState.hands[move.seat];
+      var i = h.findIndex(function(c){return c.r===move.card.r&&c.s===move.card.s;});
+      if(i>=0) h.splice(i,1);
+    }
+    var sym = SYM_MAP[move.card.s]||'?';
+    log.innerHTML += '<div><b>'+players[move.seat]+'</b> played <b>'+move.card.r+sym+'</b></div>';
+  } else if(move.type === 'round_end'){
+    _replayState.scores = move.scores ? [...move.scores] : _replayState.scores;
+    log.innerHTML += '<div style="color:#c9a84c">Score: '+_replayState.scores[0]+' – '+_replayState.scores[1]+(move.gameOver?' 🏆 '+move.winner+' wins!':'')+'</div>';
+  }
+
+  log.scrollTop = log.scrollHeight;
+  document.getElementById('rv-sc0').textContent = _replayState.scores[0];
+  document.getElementById('rv-sc1').textContent = _replayState.scores[1];
+  document.getElementById('rv-round').textContent = 'Round '+_replayState.round;
+
+  // Render table cards
+  var table = document.getElementById('rv-table');
+  var W = table.offsetWidth || 280, H = table.offsetHeight || 200;
+  var cx=W/2, cy=H/2;
+  var positions=[
+    {x:cx-18,y:cy+10},  // seat 0 (bottom)
+    {x:cx+30,y:cy-27}, // seat 1 (right)
+    {x:cx-18,y:cy-64}, // seat 2 (top)
+    {x:cx-66,y:cy-27}  // seat 3 (left)
+  ];
+  table.innerHTML = '';
+  _replayState.table.forEach(function(card, seat){
+    if(!card) return;
+    var pos = positions[seat];
+    var cls = (card.s==='H'||card.s==='D')?'red':'blk';
+    var sym = SYM_MAP[card.s]||'?';
+    var el = document.createElement('div');
+    el.className = 'rv-card '+cls;
+    el.style.left = pos.x+'px';
+    el.style.top = pos.y+'px';
+    el.innerHTML = '<div class="cr" style="font-size:12px;font-weight:800;">'+card.r+'</div>'+
+      '<div class="cs" style="font-size:10px;">'+sym+'</div>';
+    table.appendChild(el);
+  });
+
+  // Button states
+  document.getElementById('replay-prev').disabled = idx<=0;
+  document.getElementById('replay-next').disabled = idx>=moves.length-1;
+}
+
+// Wire replay viewer buttons
+document.getElementById('replay-back').onclick = function(){
+  clearInterval(_replayAuto); _replayAuto=null;
+  document.getElementById('replay-play').textContent='▶ Auto';
+  go('s-replays');
+};
+document.getElementById('replay-prev').onclick = function(){
+  if(_replayIdx>0){_replayIdx--;_renderReplayMove();}
+};
+document.getElementById('replay-next').onclick = function(){
+  if(_replayIdx<_currentReplay.moves.length-1){_replayIdx++;_renderReplayMove();}
+};
+document.getElementById('replay-play').onclick = function(){
+  if(_replayAuto){
+    clearInterval(_replayAuto); _replayAuto=null;
+    this.textContent='▶ Auto';
+  } else {
+    this.textContent='⏸ Pause';
+    _replayAuto = setInterval(function(){
+      if(_replayIdx>=_currentReplay.moves.length-1){
+        clearInterval(_replayAuto); _replayAuto=null;
+        document.getElementById('replay-play').textContent='▶ Auto';
+        return;
+      }
+      _replayIdx++; _renderReplayMove();
+    }, 800);
+  }
+};
+/* ══ END REPLAY ══ */
+
+/* ══ IDLE WARNING ══ */
+function playIdleWarningSound(){
+  try{
+    var ctx=new(window.AudioContext||window.webkitAudioContext)();
+    // Three urgent beeps
+    [0,0.25,0.5].forEach(function(delay){
+      var o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type='square';
+      o.frequency.setValueAtTime(880, ctx.currentTime+delay);
+      g.gain.setValueAtTime(0, ctx.currentTime+delay);
+      g.gain.linearRampToValueAtTime(0.3, ctx.currentTime+delay+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+delay+0.18);
+      o.start(ctx.currentTime+delay);
+      o.stop(ctx.currentTime+delay+0.2);
+    });
+  }catch(e){}
+}
+/* ══ END IDLE WARNING ══ */
 
 } // end initGame
 
