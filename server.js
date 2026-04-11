@@ -338,6 +338,7 @@ function dealRound(code) {
   const deck = newDeck();
   g.hands = [[], [], [], []];
   for (let i = 0; i < deck.length; i++) g.hands[i % 4].push(deck[i]);
+  recordMove(code, 'deal', { dealer: g.dealer, round: g.round, hands: g.hands.map(h=>[...h]), scores:[...g.scores] });
   io.to(code).emit('new_round', {
     dealer: g.dealer, round: g.round, scores: g.scores,
     seatOrder: room.seats.map(s => ({ id: s.id, name: s.name, credits: s.credits || 100, level: s.level || getLevel(100) }))
@@ -391,6 +392,7 @@ function askNextBid(code) {
       io.to(code).emit('bid3_result', { partnerSeat, partnerBid: g.bids[partnerSeat], ownBid: bid, subtractAmt });
     } else {
       g.bids[seat] = bid; g.bidIdx++;
+      recordMove(code,'bid',{seat,bid});
       io.to(code).emit('bid_placed', { seat, bid });
     }
     setTimeout(() => askNextBid(code), 600);
@@ -806,6 +808,7 @@ io.on('connection', socket => {
     const g=room.game;
     const seat=g.bidOrder[g.bidIdx];
     g.bids[seat]=bid; g.bidIdx++;
+    recordMove(code,'bid',{seat,bid});
     io.to(code).emit('bid_placed',{seat,bid});
     askNextBid(code);
   });
