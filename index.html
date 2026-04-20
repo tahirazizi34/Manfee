@@ -275,10 +275,10 @@ html,body{height:100%;background:#060f09;}
 #ghost{position:fixed;width:48px;height:72px;background:#fff;border:1px solid #ccc;border-radius:6px;pointer-events:none;z-index:999;display:none;flex-direction:column;align-items:flex-start;padding:4px;opacity:.85;}
 #ghost .cr{font-size:13px;font-weight:700;}
 #ghost .cs{font-size:10px;}
-#ghost.red .cr,#ghost.red .cs{color:#cc0000;}
-
-#ghost.blk .cr,#ghost.blk .cs{color:#111;}
-
+#ghost.hrt .cr,#ghost.hrt .cs{color:#e03030;}
+#ghost.dia .cr,#ghost.dia .cs{color:#e06020;}
+#ghost.spd .cr,#ghost.spd .cs{color:#1a3a7a;}
+#ghost.clb .cr,#ghost.clb .cs{color:#1a6e2e;}
 #ghost.blk .cr,#ghost.blk .cs{color:#111;}
 .abar{display:flex;align-items:center;gap:7px;padding:6px 10px;background:rgba(0,0,0,.4);border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;position:relative;z-index:25;}
 .g-chat-bar{flex-shrink:0;background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.06);position:relative;z-index:25;}
@@ -320,7 +320,7 @@ html,body{height:100%;background:#060f09;}
 .bmarks{display:flex;justify-content:space-between;font-size:8px;color:var(--tm);margin-bottom:10px;}
 .binfo{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:10px;color:rgba(255,255,255,.6);text-align:left;line-height:1.8;}
 .binfo b{color:var(--gold);}
-.gcbtn{width:100%;background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:9px;color:#0a1a08;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.5px;box-shadow:0 3px 12px rgba(201,168,76,.3);transition:all .2s;margin-top:6px;}
+.gcbtn{width:100%;background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:9px;color:#0a1a08;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.5px;box-shadow:0 3px 12px rgba(201,168,76,.3);transition:all .2s;}
 .gcbtn:hover{background:var(--gold2);}
 .gcbtn.sec{background:transparent;border:1.5px solid rgba(201,168,76,.5);color:var(--gold);margin-top:7px;}
 .opt-btn{width:100%;border:none;border-radius:7px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;margin-top:6px;text-align:left;padding-left:12px;}
@@ -328,7 +328,7 @@ html,body{height:100%;background:#060f09;}
 .opt-btn.b{background:rgba(201,168,76,.1);border:1.5px solid rgba(201,168,76,.5);color:var(--gold);}
 .opt-btn.c{background:rgba(232,201,106,.08);border:1.5px solid rgba(232,201,106,.4);color:#e8c96a;}
 .opt-tag{display:inline-block;background:rgba(201,168,76,.2);border-radius:3px;padding:1px 5px;font-size:9px;margin-left:5px;}
-.mem-cards{display:flex;flex-wrap:nowrap;justify-content:center;margin:8px 0;overflow:visible;width:100%;}
+.mem-cards{display:flex;flex-wrap:nowrap;justify-content:center;margin:8px 0;overflow:visible;}
 .mem-timer{font-size:26px;font-weight:700;color:var(--gold);margin-bottom:8px;}
 #s-result{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#0a2a4a 0%,#051525 70%,#020d18 100%);}
 .rcard{background:rgba(5,15,30,.9);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px 24px;text-align:center;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);}
@@ -340,7 +340,6 @@ html,body{height:100%;background:#060f09;}
 .rdet{color:var(--tm);font-size:10px;margin-bottom:16px;white-space:pre-line;line-height:1.7;}
 .rbtn{background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:12px;padding:12px 24px;color:#0a1a08;font-size:13px;font-weight:800;cursor:pointer;margin:4px;box-shadow:0 4px 16px rgba(201,168,76,.3);}
 .rbtn.sec{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);}
-
 /* ── AUTH ── */
 .auth-inp{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;outline:none;width:100%;box-sizing:border-box;}
 .auth-inp:focus{border-color:#c9a84c;}
@@ -361,10 +360,10 @@ html,body{height:100%;background:#060f09;}
 .bj-card .bj-rank{font-size:15px;font-weight:800;line-height:1;}
 .bj-card .bj-suit{font-size:11px;line-height:1;}
 .bj-card .bj-center{font-size:26px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
-.bj-card.spd .bj-rank,.bj-card.spd .bj-suit{color:#1a3a7a;}
-.bj-card.clb .bj-rank,.bj-card.clb .bj-suit{color:#1a6e2e;}
-.bj-card.hrt .bj-rank,.bj-card.hrt .bj-suit{color:#cc2222;}
-.bj-card.dia .bj-rank,.bj-card.dia .bj-suit{color:#cc5500;}
+.bj-card.spd .bj-rank,.bj-card.spd .bj-suit,
+.bj-card.clb .bj-rank,.bj-card.clb .bj-suit{color:#111111;}
+.bj-card.hrt .bj-rank,.bj-card.hrt .bj-suit,
+.bj-card.dia .bj-rank,.bj-card.dia .bj-suit{color:#cc0000;}
 .bj-card.active-hand{border-color:#c9a84c;box-shadow:0 0 12px rgba(201,168,76,.6);}
 .bj-chip{width:46px;height:46px;border-radius:50%;border:3px solid rgba(255,255,255,.3);background:linear-gradient(135deg,#8b0000,#cc0000);color:#fff;font-size:12px;font-weight:800;cursor:pointer;transition:transform .1s;}
 .bj-chip:active{transform:scale(.9);}
@@ -388,6 +387,8 @@ html,body{height:100%;background:#060f09;}
 .rv-card{width:36px;height:54px;background:#fff;border:1px solid #ccc;border-radius:5px;display:flex;flex-direction:column;align-items:flex-start;padding:3px;position:absolute;box-shadow:0 2px 8px rgba(0,0,0,.6);transition:all .3s;}
 .rv-card.red .cr,.rv-card.red .cs{color:#cc0000;}
 .rv-card.blk .cr,.rv-card.blk .cs{color:#111;}
+
+
 
 </style>
 </head>
@@ -466,7 +467,7 @@ html,body{height:100%;background:#060f09;}
       <span class="hd-diamond">◆</span>
       <span class="hd-line"></span>
     </div>
-    <div id="home-profile-box" class="home-profile" style="display:none">
+<div id="home-profile-box" class="home-profile" style="display:none">
       <div class="hp-av" id="hp-av" style="background:#1a3a7a;">?</div>
       <div class="hp-info"><div class="hp-name" id="hp-name">Player</div><div class="hp-level" id="hp-level" style="color:#aaaaff;">Newcomer</div><div class="hp-credits" id="hp-credits">100 credits</div></div>
       <button class="hp-logout" onclick="window._logout&&window._logout()">Logout</button>
@@ -488,8 +489,8 @@ html,body{height:100%;background:#060f09;}
         </div>
       </button>
     </div>
-    <div class="home-hint" id="home-hint">Enter your name to start playing</div>
     <button onclick="window._showReplays&&window._showReplays()" style="background:none;border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 24px;color:rgba(255,255,255,.5);font-size:11px;cursor:pointer;margin-top:8px;letter-spacing:.5px;">▶ Watch Replays</button>
+    <div class="home-hint" id="home-hint">Enter your name to start playing</div>
   </div>
 </div>
 
@@ -734,8 +735,6 @@ html,body{height:100%;background:#060f09;}
   <div class="gmodal">
     <h2>Your Bid <span style="font-size:11px;color:rgba(255,255,255,.5);font-weight:400;">(3rd Bidder)</span></h2>
     <p class="gmsub" id="bid3-sub">You can subtract from your partner's bid first</p>
-
-    <!-- Step 1: Subtract from partner -->
     <div id="bid3-step1">
       <div class="binfo" id="bid3-partner-info"></div>
       <label style="font-size:10px;color:rgba(255,255,255,.5);display:block;margin-bottom:4px;">SUBTRACT FROM PARTNER'S BID</label>
@@ -746,8 +745,6 @@ html,body{height:100%;background:#060f09;}
       <div class="bmarks"><span>0</span><span id="bid3-sub-max-lbl">partner bid</span></div>
       <button class="gcbtn" id="bid3-next-btn">Next → Set My Bid</button>
     </div>
-
-    <!-- Step 2: Own bid -->
     <div id="bid3-step2" style="display:none;">
       <div class="binfo" id="bid3-own-info"></div>
       <label style="font-size:10px;color:rgba(255,255,255,.5);display:block;margin-bottom:4px;">YOUR BID</label>
@@ -767,66 +764,42 @@ html,body{height:100%;background:#060f09;}
   <div class="gov" id="gov-mem"><div class="gmodal"><h2>Cards Switched!</h2><div class="gmsub" id="gmem-sub"></div><div class="mem-cards" id="gmem-cards"></div><div class="mem-timer" id="gmem-timer">30</div><button class="gcbtn" id="btn-mem-ok">Ready — Start Play</button></div></div>
 </div>
 
+
 <div id="s-blackjack" class="scr" style="background:radial-gradient(ellipse at 50% 40%,#0a2a0a,#051505,#010d01);">
-  <!-- Top bar -->
   <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(0,0,0,.4);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;">
     <button id="bj-menu" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;">⎋</button>
     <div style="font-size:13px;font-weight:700;color:#fff;">♠ Blackjack</div>
-    <div style="text-align:right;">
-      <div style="font-size:10px;color:rgba(255,255,255,.4);">CREDITS</div>
-      <div id="bj-credits" style="font-size:14px;font-weight:800;color:#c9a84c;">100</div>
-    </div>
+    <div style="text-align:right;"><div style="font-size:10px;color:rgba(255,255,255,.4);">CREDITS</div><div id="bj-credits" style="font-size:14px;font-weight:800;color:#c9a84c;">100</div></div>
   </div>
-
-  <!-- Game area -->
   <div style="flex:1;display:flex;flex-direction:column;padding:10px 14px;gap:6px;overflow:hidden;min-height:0;">
-    <!-- Dealer -->
     <div style="text-align:center;flex-shrink:0;">
       <div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1px;margin-bottom:2px;">🤖 DEALER (AI)</div>
       <div id="bj-dealer-score" style="font-size:13px;font-weight:700;color:#e74c3c;min-height:18px;"></div>
       <div id="bj-dealer-cards" style="display:flex;justify-content:center;min-height:86px;align-items:center;margin-top:4px;"></div>
     </div>
-
-    <!-- Message bar -->
     <div id="bj-msg" style="text-align:center;font-size:15px;font-weight:800;color:#fff;min-height:24px;padding:4px 8px;background:rgba(0,0,0,.3);border-radius:8px;flex-shrink:0;"></div>
-
-    <!-- Player hands (supports splits) -->
-    <div id="bj-hands-area" style="flex:1;display:flex;justify-content:center;align-items:flex-start;gap:12px;min-height:0;">
-    </div>
+    <div id="bj-hands-area" style="flex:1;display:flex;justify-content:center;align-items:flex-start;gap:12px;min-height:0;"></div>
     <div style="text-align:center;font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1px;flex-shrink:0;">👤 YOU</div>
   </div>
-
-  <!-- Bet area (shown before deal) -->
   <div id="bj-bet-area" style="flex-shrink:0;padding:10px 14px;background:rgba(0,0,0,.4);border-top:1px solid rgba(255,255,255,.08);">
     <div style="font-size:10px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:8px;">PLACE YOUR BET</div>
     <div style="display:flex;justify-content:center;gap:8px;margin-bottom:10px;">
-      <button class="bj-chip" data-bet="5">5</button>
-      <button class="bj-chip" data-bet="10">10</button>
-      <button class="bj-chip" data-bet="25">25</button>
-      <button class="bj-chip" data-bet="50">50</button>
+      <button class="bj-chip" data-bet="5">5</button><button class="bj-chip" data-bet="10">10</button>
+      <button class="bj-chip" data-bet="25">25</button><button class="bj-chip" data-bet="50">50</button>
       <button class="bj-chip" data-bet="100">100</button>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div>
-        <div style="font-size:10px;color:rgba(255,255,255,.4);">CURRENT BET</div>
-        <div id="bj-bet-display" style="font-size:22px;font-weight:900;color:#c9a84c;">0</div>
-      </div>
+      <div><div style="font-size:10px;color:rgba(255,255,255,.4);">CURRENT BET</div><div id="bj-bet-display" style="font-size:22px;font-weight:900;color:#c9a84c;">0</div></div>
       <div style="display:flex;gap:8px;">
         <button id="bj-clear-bet" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:8px 12px;color:rgba(255,255,255,.6);font-size:11px;cursor:pointer;">Clear</button>
         <button id="bj-deal-btn" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);border:none;border-radius:10px;padding:10px 24px;color:#0a1a08;font-size:13px;font-weight:800;cursor:pointer;">DEAL</button>
       </div>
     </div>
   </div>
-
-  <!-- Action buttons (shown during play) -->
   <div id="bj-action-area" style="display:none;flex-shrink:0;padding:10px 14px;background:rgba(0,0,0,.4);border-top:1px solid rgba(255,255,255,.08);">
-    <div style="text-align:center;margin-bottom:8px;">
-      <span style="font-size:10px;color:rgba(255,255,255,.4);">BET: </span>
-      <span id="bj-current-bet-lbl" style="font-size:13px;font-weight:700;color:#c9a84c;">0</span>
-    </div>
+    <div style="text-align:center;margin-bottom:8px;"><span style="font-size:10px;color:rgba(255,255,255,.4);">BET: </span><span id="bj-current-bet-lbl" style="font-size:13px;font-weight:700;color:#c9a84c;">0</span></div>
     <div style="display:flex;gap:8px;justify-content:center;">
-      <button id="bj-hit" class="bj-action-btn">HIT</button>
-      <button id="bj-stand" class="bj-action-btn">STAND</button>
+      <button id="bj-hit" class="bj-action-btn">HIT</button><button id="bj-stand" class="bj-action-btn">STAND</button>
       <button id="bj-double" class="bj-action-btn bj-dbl">DOUBLE</button>
       <button id="bj-split" class="bj-action-btn bj-spl" style="display:none;">SPLIT</button>
       <button id="bj-insurance" class="bj-action-btn bj-ins" style="display:none;">INSURE</button>
@@ -871,6 +844,8 @@ html,body{height:100%;background:#060f09;}
 })();
 </script>
 <script>
+
+
 
 
 
@@ -1458,6 +1433,9 @@ function initOfflineGame(mode){
 }
 
 function offGoHome(){
+  if(typeof offReplaySave==='function' && typeof OG_REPLAY!=='undefined' && OG_REPLAY){
+    offReplaySave(OG.scores?[OG.scores[0],OG.scores[1]]:null);
+  }
   document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
   var hn=offEl('s-name');if(hn)hn.classList.add('on');
 }
@@ -1940,8 +1918,10 @@ function offEndRound(){
     gameOver:gameOver, winner:gameOver?(OG.scores[0]>OG.scores[1]?'Team A':'Team B'):null
   });
   if(gameOver && typeof offReplaySave==='function'){
-    if(OG_REPLAY) OG_REPLAY.finalScores=[OG.scores[0],OG.scores[1]];
-    offReplaySave();
+    offReplaySave([OG.scores[0],OG.scores[1]]);
+  } else if(typeof offReplayRecord==='function'){
+    // Save partial game in case user quits later
+    _offReplayFlush && _offReplayFlush(false);
   }
   offSet('res-s0',OG.scores[0]);
   offSet('res-s1',OG.scores[1]);
@@ -2832,188 +2812,19 @@ function playIdleWarningSound(){
 }
 window.playIdleWarningSound = playIdleWarningSound;
 /* ══ END IDLE WARNING ══ */
-/* ══ OFFLINE REPLAY RECORDING ══ */
-var OG_REPLAY = null;
 
-function offReplayStart(mode, players){
-  OG_REPLAY = {
-    code: 'offline_' + Date.now(),
-    mode: mode,
-    players: players.map(function(n){return {name:n};}),
-    startTime: Date.now(),
-    moves: [],
-    scores: [0,0],
-    offline: true
-  };
-}
-
-function offReplayRecord(type, data){
-  if(!OG_REPLAY) return;
-  var move = {t: Date.now() - OG_REPLAY.startTime, type: type};
-  Object.keys(data).forEach(function(k){ move[k] = data[k]; });
-  OG_REPLAY.moves.push(move);
-}
-
-function offReplaySave(){
-  if(!OG_REPLAY) return;
-  OG_REPLAY.endTime = Date.now();
-  try {
-    var saved = JSON.parse(localStorage.getItem('tteka_offline_replays') || '[]');
-    saved.unshift(OG_REPLAY);
-    if(saved.length > 20) saved = saved.slice(0, 20); // keep last 20
-    localStorage.setItem('tteka_offline_replays', JSON.stringify(saved));
-  } catch(e){ console.warn('Could not save replay:', e); }
-  OG_REPLAY = null;
-}
-
-window.offReplayStart = offReplayStart;
-window.offReplayRecord = offReplayRecord;
-window.offReplaySave = offReplaySave;
-
-// Extend _showReplays to also load offline replays from localStorage
-var _origShowReplays = window._showReplays;
-window._showReplays = function(){
-  if(typeof go !== 'function'){alert('Game not loaded yet');return;}
-  go('s-replays');
-  var list = document.getElementById('replay-list');
-  if(!list) return;
-  list.innerHTML = '<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">Loading...</div>';
-
-  // Load offline replays from localStorage
-  var offlineReplays = [];
-  try {
-    offlineReplays = JSON.parse(localStorage.getItem('tteka_offline_replays') || '[]');
-  } catch(e){}
-
-  // Load online replays from server
-  fetch((window.SERVER_URL||window.location.origin) + '/api/replays')
-    .then(function(r){return r.json();})
-    .then(function(data){
-      var online = (data.ok && data.replays) ? data.replays : [];
-      var all = [];
-
-      // Format offline replays
-      offlineReplays.forEach(function(r){
-        all.push({
-          code: r.code,
-          players: r.players.map(function(p){return p.name;}),
-          mode: r.mode,
-          startTime: r.startTime,
-          endTime: r.endTime,
-          finalScores: r.finalScores || r.scores || [0,0],
-          moveCount: r.moves ? r.moves.length : 0,
-          duration: r.endTime ? Math.round((r.endTime-r.startTime)/1000) : null,
-          offline: true,
-          _data: r
-        });
-      });
-
-      // Format online replays
-      online.forEach(function(r){
-        all.push({
-          code: r.code,
-          players: r.players,
-          mode: r.mode,
-          startTime: r.startTime,
-          endTime: r.endTime,
-          finalScores: r.finalScores || [0,0],
-          moveCount: r.moveCount || 0,
-          duration: r.duration,
-          offline: false
-        });
-      });
-
-      // Sort by most recent
-      all.sort(function(a,b){return b.startTime - a.startTime;});
-
-      if(!all.length){
-        list.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">No replays yet. Play some games first!</div>';
-        return;
-      }
-
-      list.innerHTML = all.map(function(r){
-        var date = new Date(r.startTime).toLocaleDateString();
-        var time = new Date(r.startTime).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-        var dur = r.duration ? Math.floor(r.duration/60)+'m '+(r.duration%60)+'s' : '—';
-        var score = r.finalScores ? r.finalScores[0]+' – '+r.finalScores[1] : '—';
-        var players = Array.isArray(r.players) ? r.players.join(' · ') : '—';
-        var tag = r.offline
-          ? '<span style="font-size:9px;background:rgba(100,200,100,.2);color:#80ee80;border-radius:4px;padding:1px 5px;margin-left:4px;">vs AI</span>'
-          : '<span style="font-size:9px;background:rgba(100,150,255,.2);color:#80aaff;border-radius:4px;padding:1px 5px;margin-left:4px;">Online</span>';
-        return '<div class="replay-card" data-code="'+r.code+'" onclick="window._loadReplay(this.dataset.code)">' +
-          '<div class="replay-card-players">'+players+tag+'</div>'+
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">'+
-          '<div class="replay-card-meta">'+date+' '+time+' · '+(r.mode||'Manfee')+' · '+dur+'</div>'+
-          '<div class="replay-card-score">'+score+'</div>'+
-          '</div></div>';
-      }).join('');
-    })
-    .catch(function(e){
-      // Server fetch failed — still show offline replays
-      if(offlineReplays.length){
-        list.innerHTML = offlineReplays.map(function(r){
-          var date = new Date(r.startTime).toLocaleDateString();
-          var score = r.finalScores ? r.finalScores[0]+' – '+r.finalScores[1] : '—';
-          var players = r.players.map(function(p){return p.name;}).join(' · ');
-          return '<div class="replay-card" data-code="'+r.code+'" onclick="window._loadReplay(this.dataset.code)">' +
-            '<div class="replay-card-players">'+players+' <span style="font-size:9px;background:rgba(100,200,100,.2);color:#80ee80;border-radius:4px;padding:1px 5px;">vs AI</span></div>'+
-            '<div class="replay-card-meta">'+date+'</div>'+
-            '<div class="replay-card-score">'+score+'</div>'+
-            '</div>';
-        }).join('');
-      } else {
-        list.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">No replays yet.</div>';
-      }
-    });
-};
-
-// Extend _loadReplay to handle offline replays stored in localStorage
-var _origLoadReplay = window._loadReplay;
-window._loadReplay = function(code){
-  // Check localStorage first
-  if(code.startsWith('offline_')){
-    try {
-      var saved = JSON.parse(localStorage.getItem('tteka_offline_replays') || '[]');
-      var replay = saved.find(function(r){return r.code===code;});
-      if(replay){
-        _currentReplay = replay;
-        _replayIdx = 0;
-        _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
-        go('s-replay-view');
-        var players = replay.players.map(function(p){return p.name;});
-        document.getElementById('replay-title').textContent = players.join(' vs ');
-        document.getElementById('replay-info').textContent =
-          (replay.mode||'Manfee')+' vs AI · '+new Date(replay.startTime).toLocaleString();
-        _renderReplayMove();
-        return;
-      }
-    } catch(e){}
-  }
-  // Fall back to server fetch
-  fetch((window.SERVER_URL||window.location.origin) + '/api/replay/' + code)
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(!data.ok){alert('Replay not found');return;}
-      _currentReplay = data.replay;
-      _replayIdx = 0;
-      _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
-      go('s-replay-view');
-      var players = _currentReplay.players.map(function(p){return p.name;});
-      document.getElementById('replay-title').textContent = players.join(' vs ');
-      document.getElementById('replay-info').textContent =
-        (_currentReplay.mode||'Manfee')+' · '+new Date(_currentReplay.startTime).toLocaleString();
-      _renderReplayMove();
-    });
-};
-/* ══ END OFFLINE REPLAY ══ */
 
 
 } // end initGame
 
 
 
+
+
 </script>
 <script>
+
+
 /* ══════════════════════════════════════════════
    BLACKJACK ENGINE — Player vs Dealer (AI)
    Rules:
@@ -3476,18 +3287,204 @@ function initBlackjack(){
     BJ.dealer=[]; BJ.activeIdx=0;
     BJ.phase='bet'; BJ.insurance=0;
     BJ.currentBet=Math.min(BJ.lastBet,BJ.credits);
-    document.getElementById('bj-bet-area').style.display='';
+    document.getElementById('bj-bet-area').style.displ
+ay='';
     document.getElementById('bj-action-area').style.display='none';
     document.getElementById('bj-next-hand').style.display='none';
     bjMsg('');
     bjRender();
   };
 }
-/* ══ END BLACKJACK ══ */
+window.initBlackjack=initBlackjack;
+
+
 window.initBlackjack=initBlackjack;
 </script>
-
 <script>
+
+
+/* ══ OFFLINE REPLAY RECORDING ══ */
+var OG_REPLAY = null;
+var REPLAY_KEY = 'tteka_offline_replays';
+var MAX_REPLAYS_STORED = 5;
+var REPLAY_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function offReplayStart(mode, players){
+  OG_REPLAY = {
+    code: 'offline_' + Date.now(),
+    mode: mode,
+    players: players.map(function(n){ return {name:n}; }),
+    startTime: Date.now(),
+    moves: [],
+    scores: [0, 0],
+    finalScores: null,
+    offline: true
+  };
+}
+
+function offReplayRecord(type, data){
+  if(!OG_REPLAY) return;
+  var move = { t: Date.now() - OG_REPLAY.startTime, type: type };
+  Object.keys(data).forEach(function(k){ move[k] = data[k]; });
+  OG_REPLAY.moves.push(move);
+  // Auto-save every 10 moves so partial games are preserved
+  if(OG_REPLAY.moves.length % 10 === 0) _offReplayFlush(false);
+}
+
+function offReplaySave(finalScores){
+  if(!OG_REPLAY) return;
+  OG_REPLAY.endTime = Date.now();
+  if(finalScores) OG_REPLAY.finalScores = finalScores;
+  _offReplayFlush(true);
+  OG_REPLAY = null;
+}
+
+function _offReplayFlush(isFinal){
+  if(!OG_REPLAY) return;
+  try {
+    var raw = localStorage.getItem(REPLAY_KEY);
+    var saved = raw ? JSON.parse(raw) : [];
+    // Remove expired replays (older than 24h)
+    var now = Date.now();
+    saved = saved.filter(function(r){ return now - r.startTime < REPLAY_EXPIRY_MS; });
+    // Update or insert current replay
+    var existIdx = saved.findIndex(function(r){ return r.code === OG_REPLAY.code; });
+    var snapshot = JSON.parse(JSON.stringify(OG_REPLAY)); // deep copy
+    if(existIdx >= 0) {
+      saved[existIdx] = snapshot;
+    } else {
+      saved.unshift(snapshot);
+    }
+    // Keep only last 5
+    if(saved.length > MAX_REPLAYS_STORED) saved = saved.slice(0, MAX_REPLAYS_STORED);
+    localStorage.setItem(REPLAY_KEY, JSON.stringify(saved));
+  } catch(e){ console.warn('Replay save error:', e); }
+}
+
+function _offReplayLoadAll(){
+  try {
+    var raw = localStorage.getItem(REPLAY_KEY);
+    if(!raw) return [];
+    var saved = JSON.parse(raw);
+    var now = Date.now();
+    // Filter expired
+    var valid = saved.filter(function(r){ return now - r.startTime < REPLAY_EXPIRY_MS; });
+    // If some expired, clean up storage
+    if(valid.length < saved.length){
+      localStorage.setItem(REPLAY_KEY, JSON.stringify(valid));
+    }
+    return valid;
+  } catch(e){ return []; }
+}
+
+window.offReplayStart = offReplayStart;
+window.offReplayRecord = offReplayRecord;
+window.offReplaySave = offReplaySave;
+
+// Extend _showReplays to combine offline + online replays
+window._showReplays = function(){
+  if(typeof go !== 'function'){ alert('Game not loaded yet'); return; }
+  go('s-replays');
+  var list = document.getElementById('replay-list');
+  if(!list) return;
+  list.innerHTML = '<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">Loading...</div>';
+
+  var offlineReplays = _offReplayLoadAll();
+
+  function renderList(onlineReplays){
+    var all = [];
+
+    offlineReplays.forEach(function(r){
+      var dur = r.endTime ? Math.round((r.endTime - r.startTime)/1000) : null;
+      all.push({
+        code: r.code, offline: true,
+        players: r.players.map(function(p){ return p.name; }),
+        mode: r.mode, startTime: r.startTime,
+        finalScores: r.finalScores || r.scores || [0,0],
+        duration: dur,
+        moveCount: r.moves ? r.moves.length : 0
+      });
+    });
+
+    (onlineReplays||[]).forEach(function(r){
+      all.push({ code:r.code, offline:false, players:r.players, mode:r.mode,
+        startTime:r.startTime, finalScores:r.finalScores||[0,0],
+        duration:r.duration, moveCount:r.moveCount||0 });
+    });
+
+    all.sort(function(a,b){ return b.startTime - a.startTime; });
+
+    if(!all.length){
+      list.innerHTML = '<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px 20px;">No replays yet. Play some games first!</div>';
+      return;
+    }
+
+    list.innerHTML = all.map(function(r){
+      var date = new Date(r.startTime).toLocaleDateString();
+      var time = new Date(r.startTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      var expiry = r.offline ? ' · expires in ' + Math.max(0, Math.floor((r.startTime + REPLAY_EXPIRY_MS - Date.now())/3600000)) + 'h' : '';
+      var dur = r.duration ? Math.floor(r.duration/60)+'m '+(r.duration%60)+'s' : '—';
+      var score = r.finalScores ? r.finalScores[0]+' – '+r.finalScores[1] : 'In progress';
+      var players = r.players.join(' · ');
+      var tag = r.offline
+        ? '<span style="font-size:9px;background:rgba(100,200,100,.15);color:#80ee80;border-radius:4px;padding:1px 6px;margin-left:4px;border:1px solid rgba(100,200,100,.3);">vs AI</span>'
+        : '<span style="font-size:9px;background:rgba(100,150,255,.15);color:#80aaff;border-radius:4px;padding:1px 6px;margin-left:4px;border:1px solid rgba(100,150,255,.3);">Online</span>';
+      return '<div class="replay-card" data-rcode="'+r.code+'" onclick="window._loadReplay(this.dataset.rcode)">' +
+        '<div class="replay-card-players">'+players+tag+'</div>'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">'+
+        '<div class="replay-card-meta">'+date+' '+time+' · '+(r.mode==='manfee'?'Afghani Manfee':r.mode||'Manfee')+' · '+dur+expiry+'</div>'+
+        '<div class="replay-card-score">'+score+'</div>'+
+        '</div></div>';
+    }).join('');
+  }
+
+  // Try to fetch online replays, render regardless
+  fetch((window.SERVER_URL||window.location.origin) + '/api/replays')
+    .then(function(r){ return r.json(); })
+    .then(function(data){ renderList(data.ok ? data.replays : []); })
+    .catch(function(){ renderList([]); });
+};
+
+// Load a replay — check localStorage first, then server
+window._loadReplay = function(code){
+  var replay = null;
+  if(code && code.indexOf('offline_') === 0){
+    var all = _offReplayLoadAll();
+    replay = all.find(function(r){ return r.code === code; }) || null;
+  }
+  if(replay){
+    _startReplayViewer(replay);
+  } else {
+    fetch((window.SERVER_URL||window.location.origin) + '/api/replay/' + code)
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if(!data.ok){ alert('Replay not found'); return; }
+        _startReplayViewer(data.replay);
+      })
+      .catch(function(){ alert('Could not load replay'); });
+  }
+};
+
+function _startReplayViewer(replay){
+  _currentReplay = replay;
+  _replayIdx = 0;
+  _replayState = { scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]] };
+  go('s-replay-view');
+  var players = replay.players.map(function(p){ return p.name; });
+  document.getElementById('replay-title').textContent = players.join(' vs ');
+  document.getElementById('replay-info').textContent =
+    (replay.mode==='manfee'?'Afghani Manfee':replay.mode||'Manfee') +
+    (replay.offline?' · vs AI':' · Online') +
+    ' · ' + new Date(replay.startTime).toLocaleString();
+  _renderReplayMove();
+}
+/* ══ END OFFLINE REPLAY ══ */
+
+
+</script>
+<script>
+
+
 /* ══ REPLAY SYSTEM ══ */
 var _currentReplay = null;
 var _replayIdx = 0;
@@ -3645,8 +3642,9 @@ document.getElementById('replay-play').onclick = function(){
   }
 };
 /* ══ END REPLAY ══ */
-</script>
 
+
+</script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
