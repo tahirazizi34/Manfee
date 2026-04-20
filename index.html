@@ -1402,6 +1402,7 @@ function offPlayCard(idx, card){
   OG.tk[0]=card;
   if(!OG.led)OG.led=card.s;
   offSound('card');
+  if(typeof offReplayRecord==='function') offReplayRecord('card',{seat:0,card:{r:card.r,s:card.s},led:OG.led});
   offGlog('You played '+card.r+offSym(card.s));
   offRenderHand();offRenderBacks();offRenderPlayed();
   if(OG.tk.every(function(c){return c!==null;})){
@@ -1447,7 +1448,11 @@ function initOfflineGame(mode){
   var modeNames={manfee:'Afghani Manfee',kash:'Kash',teka:'Teka'};
   offSet('g-mode-badge',(modeNames[mode]||mode.toUpperCase())+' (AI)');
   offEl('g-tri').style.display=OG.trump?'':'none';
-  offEl('g-menu-btn').onclick=function(){if(confirm('Leave game?'))offGoHome();};
+  offEl('g-menu-btn').onclick=function(){if(confirm('Leave game?')){offReplaySave();offGoHome();}};
+
+  // Start replay recording
+  var rPlayers=[ME.name||'Player',AI_NAMES[0],AI_NAMES[1],AI_NAMES[2]];
+  if(typeof offReplayStart==='function') offReplayStart(mode, rPlayers);
 
   setTimeout(offDeal,100);
 }
@@ -1488,7 +1493,13 @@ function offDeal(){
   offRenderPlayed();
   offSound('card');
 
-  // Show dealer info then start bidding
+  // Record deal
+  if(typeof offReplayRecord==='function') offReplayRecord('deal',{
+    round:OG.round, dealer:OG.dealer,
+    hands:OG.h.map(function(h){return h.slice();}),
+    scores:[OG.scores[0],OG.scores[1]]
+  });
+
   offGmsg('Dealer: <b>'+names[OG.dealer]+'</b> · Bidding starts...');
   offGlog('Round '+OG.round+' · Dealer: <b>'+names[OG.dealer]+'</b>');
   setTimeout(offNextBid,1500);
@@ -1598,6 +1609,7 @@ function offShowBid3Modal(){
         offSet('pb'+partnerSeat,newPartnerBid);
       }
       OG.bids[0]=ownBid;
+      if(typeof offReplayRecord==='function') offReplayRecord('bid',{seat:0,bid:ownBid,subtractAmt:subtract,partnerSeat:partnerSeat});
       offGlog('You bid <b>'+ownBid+'</b>'+(subtract>0?' (subtracted '+subtract+' from partner)':''));
       offSet('pb0',ownBid);
       OG.bidIdx++;
@@ -1622,6 +1634,7 @@ function offAIBid(seat){
   var b=Math.max(0,Math.min(maxBid,Math.round(estimate)));
   OG.bids[seat]=b;
   var names=[ME.name,AI_NAMES[0],AI_NAMES[1],AI_NAMES[2]];
+  if(typeof offReplayRecord==='function') offReplayRecord('bid',{seat:seat,bid:b});
   offGlog('<b>'+names[seat]+'</b> bid <b>'+b+'</b>');
   offSet('pb'+seat,b);
   OG.bidIdx++;offNextBid();
@@ -1724,6 +1737,7 @@ function offAIPlay(){
   if(!OG.led)OG.led=card.s;
   OG.tk[seat]=card;
   offSound('card');
+  if(typeof offReplayRecord==='function') offReplayRecord('card',{seat:seat,card:{r:card.r,s:card.s},led:OG.led});
   var names=[ME.name,AI_NAMES[0],AI_NAMES[1],AI_NAMES[2]];
   offGlog('<b>'+names[seat]+'</b> played '+card.r+offSym(card.s));
   offRenderPlayed();offRenderBacks();
@@ -1921,6 +1935,14 @@ function offEndRound(){
   } else {p0=us;p1=them;det='You: '+us+' tricks · AI: '+them+' tricks';}
   OG.scores[0]+=p0;OG.scores[1]+=p1;
   var win=52,gameOver=OG.scores[0]>=win||OG.scores[1]>=win;
+  if(typeof offReplayRecord==='function') offReplayRecord('round_end',{
+    scores:[OG.scores[0],OG.scores[1]], p0:p0, p1:p1,
+    gameOver:gameOver, winner:gameOver?(OG.scores[0]>OG.scores[1]?'Team A':'Team B'):null
+  });
+  if(gameOver && typeof offReplaySave==='function'){
+    if(OG_REPLAY) OG_REPLAY.finalScores=[OG.scores[0],OG.scores[1]];
+    offReplaySave();
+  }
   offSet('res-s0',OG.scores[0]);
   offSet('res-s1',OG.scores[1]);
   offSet('res-title',gameOver?'Game Over!':'Round '+OG.round+' Done');
@@ -2810,6 +2832,181 @@ function playIdleWarningSound(){
 }
 window.playIdleWarningSound = playIdleWarningSound;
 /* ══ END IDLE WARNING ══ */
+/* ══ OFFLINE REPLAY RECORDING ══ */
+var OG_REPLAY = null;
+
+function offReplayStart(mode, players){
+  OG_REPLAY = {
+    code: 'offline_' + Date.now(),
+    mode: mode,
+    players: players.map(function(n){return {name:n};}),
+    startTime: Date.now(),
+    moves: [],
+    scores: [0,0],
+    offline: true
+  };
+}
+
+function offReplayRecord(type, data){
+  if(!OG_REPLAY) return;
+  var move = {t: Date.now() - OG_REPLAY.startTime, type: type};
+  Object.keys(data).forEach(function(k){ move[k] = data[k]; });
+  OG_REPLAY.moves.push(move);
+}
+
+function offReplaySave(){
+  if(!OG_REPLAY) return;
+  OG_REPLAY.endTime = Date.now();
+  try {
+    var saved = JSON.parse(localStorage.getItem('tteka_offline_replays') || '[]');
+    saved.unshift(OG_REPLAY);
+    if(saved.length > 20) saved = saved.slice(0, 20); // keep last 20
+    localStorage.setItem('tteka_offline_replays', JSON.stringify(saved));
+  } catch(e){ console.warn('Could not save replay:', e); }
+  OG_REPLAY = null;
+}
+
+window.offReplayStart = offReplayStart;
+window.offReplayRecord = offReplayRecord;
+window.offReplaySave = offReplaySave;
+
+// Extend _showReplays to also load offline replays from localStorage
+var _origShowReplays = window._showReplays;
+window._showReplays = function(){
+  if(typeof go !== 'function'){alert('Game not loaded yet');return;}
+  go('s-replays');
+  var list = document.getElementById('replay-list');
+  if(!list) return;
+  list.innerHTML = '<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">Loading...</div>';
+
+  // Load offline replays from localStorage
+  var offlineReplays = [];
+  try {
+    offlineReplays = JSON.parse(localStorage.getItem('tteka_offline_replays') || '[]');
+  } catch(e){}
+
+  // Load online replays from server
+  fetch((window.SERVER_URL||window.location.origin) + '/api/replays')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var online = (data.ok && data.replays) ? data.replays : [];
+      var all = [];
+
+      // Format offline replays
+      offlineReplays.forEach(function(r){
+        all.push({
+          code: r.code,
+          players: r.players.map(function(p){return p.name;}),
+          mode: r.mode,
+          startTime: r.startTime,
+          endTime: r.endTime,
+          finalScores: r.finalScores || r.scores || [0,0],
+          moveCount: r.moves ? r.moves.length : 0,
+          duration: r.endTime ? Math.round((r.endTime-r.startTime)/1000) : null,
+          offline: true,
+          _data: r
+        });
+      });
+
+      // Format online replays
+      online.forEach(function(r){
+        all.push({
+          code: r.code,
+          players: r.players,
+          mode: r.mode,
+          startTime: r.startTime,
+          endTime: r.endTime,
+          finalScores: r.finalScores || [0,0],
+          moveCount: r.moveCount || 0,
+          duration: r.duration,
+          offline: false
+        });
+      });
+
+      // Sort by most recent
+      all.sort(function(a,b){return b.startTime - a.startTime;});
+
+      if(!all.length){
+        list.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">No replays yet. Play some games first!</div>';
+        return;
+      }
+
+      list.innerHTML = all.map(function(r){
+        var date = new Date(r.startTime).toLocaleDateString();
+        var time = new Date(r.startTime).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+        var dur = r.duration ? Math.floor(r.duration/60)+'m '+(r.duration%60)+'s' : '—';
+        var score = r.finalScores ? r.finalScores[0]+' – '+r.finalScores[1] : '—';
+        var players = Array.isArray(r.players) ? r.players.join(' · ') : '—';
+        var tag = r.offline
+          ? '<span style="font-size:9px;background:rgba(100,200,100,.2);color:#80ee80;border-radius:4px;padding:1px 5px;margin-left:4px;">vs AI</span>'
+          : '<span style="font-size:9px;background:rgba(100,150,255,.2);color:#80aaff;border-radius:4px;padding:1px 5px;margin-left:4px;">Online</span>';
+        return '<div class="replay-card" data-code="'+r.code+'" onclick="window._loadReplay(this.dataset.code)">' +
+          '<div class="replay-card-players">'+players+tag+'</div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">'+
+          '<div class="replay-card-meta">'+date+' '+time+' · '+(r.mode||'Manfee')+' · '+dur+'</div>'+
+          '<div class="replay-card-score">'+score+'</div>'+
+          '</div></div>';
+      }).join('');
+    })
+    .catch(function(e){
+      // Server fetch failed — still show offline replays
+      if(offlineReplays.length){
+        list.innerHTML = offlineReplays.map(function(r){
+          var date = new Date(r.startTime).toLocaleDateString();
+          var score = r.finalScores ? r.finalScores[0]+' – '+r.finalScores[1] : '—';
+          var players = r.players.map(function(p){return p.name;}).join(' · ');
+          return '<div class="replay-card" data-code="'+r.code+'" onclick="window._loadReplay(this.dataset.code)">' +
+            '<div class="replay-card-players">'+players+' <span style="font-size:9px;background:rgba(100,200,100,.2);color:#80ee80;border-radius:4px;padding:1px 5px;">vs AI</span></div>'+
+            '<div class="replay-card-meta">'+date+'</div>'+
+            '<div class="replay-card-score">'+score+'</div>'+
+            '</div>';
+        }).join('');
+      } else {
+        list.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:40px;">No replays yet.</div>';
+      }
+    });
+};
+
+// Extend _loadReplay to handle offline replays stored in localStorage
+var _origLoadReplay = window._loadReplay;
+window._loadReplay = function(code){
+  // Check localStorage first
+  if(code.startsWith('offline_')){
+    try {
+      var saved = JSON.parse(localStorage.getItem('tteka_offline_replays') || '[]');
+      var replay = saved.find(function(r){return r.code===code;});
+      if(replay){
+        _currentReplay = replay;
+        _replayIdx = 0;
+        _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
+        go('s-replay-view');
+        var players = replay.players.map(function(p){return p.name;});
+        document.getElementById('replay-title').textContent = players.join(' vs ');
+        document.getElementById('replay-info').textContent =
+          (replay.mode||'Manfee')+' vs AI · '+new Date(replay.startTime).toLocaleString();
+        _renderReplayMove();
+        return;
+      }
+    } catch(e){}
+  }
+  // Fall back to server fetch
+  fetch((window.SERVER_URL||window.location.origin) + '/api/replay/' + code)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(!data.ok){alert('Replay not found');return;}
+      _currentReplay = data.replay;
+      _replayIdx = 0;
+      _replayState = {scores:[0,0], round:1, table:[null,null,null,null], hands:[[],[],[],[]]};
+      go('s-replay-view');
+      var players = _currentReplay.players.map(function(p){return p.name;});
+      document.getElementById('replay-title').textContent = players.join(' vs ');
+      document.getElementById('replay-info').textContent =
+        (_currentReplay.mode||'Manfee')+' · '+new Date(_currentReplay.startTime).toLocaleString();
+      _renderReplayMove();
+    });
+};
+/* ══ END OFFLINE REPLAY ══ */
+
 
 } // end initGame
 
