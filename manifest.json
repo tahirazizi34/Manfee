@@ -1,16 +1,108 @@
 {
-  "name": "T - Teka Afghan Card Game",
+  "name": "T-Teka Afghan Card Game",
   "short_name": "T-Teka",
-  "description": "Play T-Teka, Kash, and Afghani Manfee card games online with friends",
+  "description": "Play Afghani Manfee, Kash, Teka and Blackjack with friends online or vs AI",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#051525",
-  "theme_color": "#051525",
+  "theme_color": "#c9a84c",
   "orientation": "portrait",
-  "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  "lang": "en",
+  "categories": [
+    "games",
+    "entertainment"
   ],
-  "categories": ["games", "entertainment"],
-  "lang": "en"
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "label": "Home Screen"
+    },
+    {
+      "src": "/screenshot2.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "label": "Game Screen"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon-20.png",
+      "sizes": "20x20",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-29.png",
+      "sizes": "29x29",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-40.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-58.png",
+      "sizes": "58x58",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-60.png",
+      "sizes": "60x60",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-76.png",
+      "sizes": "76x76",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-80.png",
+      "sizes": "80x80",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-87.png",
+      "sizes": "87x87",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-120.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-167.png",
+      "sizes": "167x167",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
 }

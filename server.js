@@ -246,6 +246,9 @@ app.get('/api/replay/:code', (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname));
+// Explicit routes for PWA assets
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
+app.get('/privacy.html', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
 app.get('/', (req, res) => {
   const paths = [
     path.join(__dirname, 'public', 'index.html'),
