@@ -104,5 +104,46 @@
       "sizes": "1024x1024",
       "type": "image/png"
     }
-  ]
+  ],
+  "id": "/",
+  "shortcuts": [
+    {
+      "name": "Play Online",
+      "short_name": "Online",
+      "description": "Play Afghani Manfee online with friends",
+      "url": "/?mode=online",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Play vs AI",
+      "short_name": "vs AI",
+      "description": "Play offline against computer",
+      "url": "/?mode=offline",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
